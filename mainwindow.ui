@@ -68,7 +68,7 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QGroupBox" name="signInGB">
+         <widget class="QGroupBox" name="signUpGB">
           <property name="maximumSize">
            <size>
             <width>200</width>
@@ -85,6 +85,9 @@
            <item row="0" column="0">
             <widget class="QLineEdit" name="newUserLE">
              <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
               <string>User</string>
              </property>
             </widget>
@@ -92,6 +95,9 @@
            <item row="1" column="0">
             <widget class="QLineEdit" name="emailLE">
              <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
               <string>Email</string>
              </property>
             </widget>
@@ -107,12 +113,12 @@
             </widget>
            </item>
            <item row="3" column="0">
-            <widget class="QPushButton" name="signInPB">
+            <widget class="QPushButton" name="signUpPB">
              <property name="enabled">
               <bool>false</bool>
              </property>
              <property name="text">
-              <string>Sign In</string>
+              <string>Sign Up</string>
              </property>
             </widget>
            </item>
