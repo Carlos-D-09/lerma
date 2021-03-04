@@ -33,6 +33,8 @@ private slots:
 
     void on_signUpPB_clicked();
 
+    void on_loginPB_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -40,6 +42,7 @@ private:
 
     void enableLoginPB();
     void enableSingUpPB();
+    void validateUser();
 
 };
 

@@ -41,7 +41,37 @@ void MainWindow::enableSingUpPB()
 
 }
 
-//viewSW (verStackedWidget)
+void MainWindow::validateUser()
+{
+    QMessageBox message;
+    vector<User>::iterator it; //iterador
+    QString user = ui->usernameLE->text();
+    QString password = ui->passwordLE->text();
+
+    it = find_if(users.begin(), users.end(), [&user, &password](User u) -> bool
+    {
+        return u.getUsername() == user && u.getPassword() == password;
+    }
+        );
+    if (it == users.end())
+    {
+        message.setText("Invalid credentials");
+        message.setIcon(QMessageBox::Warning);
+        //message.layout();
+        message.exec();
+    }
+    else
+    {
+        message.setText("Welcome to LERMA " + user);
+        ui->viewSW->setCurrentIndex(1);
+        /*Lo que hace es cambiar la pantalla de la aplicación, por defecto la primera
+        empieza en 0, que en este caso es la pantalla de inicio de sesión
+        */
+        message.exec();
+    }
+}
+
+//viewSW (verStackedWidget)Son todos de slots
 
 void MainWindow::on_usernameLE_textChanged(const QString &arg1)
 {
@@ -92,4 +122,11 @@ void MainWindow::on_signUpPB_clicked()
     ui->emailLE->clear();
     ui->newPasswordLE->clear();
 
+}
+
+void MainWindow::on_loginPB_clicked()
+{
+    validateUser();
+    ui->usernameLE->clear();
+    ui->passwordLE->clear();
 }
