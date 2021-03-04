@@ -57,7 +57,6 @@ void MainWindow::on_passwordLE_textChanged(const QString &arg1)
     enableLoginPB();
 }
 
-
 void MainWindow::on_newUserLE_textChanged(const QString &arg1)
 {
     Q_UNUSED (arg1);
@@ -74,4 +73,23 @@ void MainWindow::on_newPasswordLE_textChanged(const QString &arg1)
 {
     Q_UNUSED (arg1);
     enableSingUpPB();
+}
+
+void MainWindow::on_signUpPB_clicked()
+{
+    QMessageBox message;
+    User u;
+    u.setUsername(ui->newUserLE->text());
+    u.setEmail(ui->emailLE->text());
+    u.setPassword(ui->newPasswordLE->text());
+
+    users.push_back(u);
+
+    message.setText("New user created");
+    message.exec();
+
+    ui->newUserLE->clear();
+    ui->emailLE->clear();
+    ui->newPasswordLE->clear();
+
 }

@@ -31,6 +31,8 @@ private slots:
 
     void on_newPasswordLE_textChanged(const QString &arg1);
 
+    void on_signUpPB_clicked();
+
 private:
     Ui::MainWindow *ui;
 
