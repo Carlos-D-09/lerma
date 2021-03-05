@@ -43,7 +43,7 @@ private:
     void enableLoginPB();
     void enableSingUpPB();
     void validateUser();
-
+    void validateCredential();
 };
 
 #endif // MAINWINDOW_H

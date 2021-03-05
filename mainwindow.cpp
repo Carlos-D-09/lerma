@@ -13,6 +13,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+//Activar boton de LoginPB
 void MainWindow::enableLoginPB()
 {
     if(ui->usernameLE->text().length() > 0 &&
@@ -26,6 +27,7 @@ void MainWindow::enableLoginPB()
     }
 }
 
+//Activar boton de SingUPB
 void MainWindow::enableSingUpPB()
 {
     if(ui->newUserLE->text().length() > 0 &&
@@ -41,6 +43,7 @@ void MainWindow::enableSingUpPB()
 
 }
 
+//Funció para validar si el usuario ya esta registrado
 void MainWindow::validateUser()
 {
     QMessageBox message;
@@ -57,7 +60,6 @@ void MainWindow::validateUser()
     {
         message.setText("Invalid credentials");
         message.setIcon(QMessageBox::Warning);
-        //message.layout();
         message.exec();
     }
     else
@@ -68,6 +70,47 @@ void MainWindow::validateUser()
         empieza en 0, que en este caso es la pantalla de inicio de sesión
         */
         message.exec();
+    }
+}
+
+//Metodo para identificar repeticiones al momento de crear un nuevo usuaio
+void MainWindow::validateCredential()
+{
+    QMessageBox message;
+    QString user = ui->newUserLE->text();
+    QString email = ui->emailLE->text();
+    vector <User> :: iterator it; //iterador para la función find it
+    it = find_if(users.begin(),users.end(),[&user, &email](User u) -> bool
+    {
+        return (u.getUsername() == user || u.getEmail() == email);
+    }
+        );
+    if(it == users.end())
+    {
+        User u;
+        u.setUsername(ui->newUserLE->text());
+        u.setEmail(ui->emailLE->text());
+        u.setPassword(ui->newPasswordLE->text());
+
+        users.push_back(u);
+        message.setText("New user created");
+        message.exec();
+    }
+    else
+    {
+        User u = *it;
+        if(u.getUsername() == user)
+        {
+            message.setText("Plese try other username, this have been");
+            message.setIcon(QMessageBox::Warning);
+            message.exec();
+        }
+        else if(u.getEmail() == email)
+        {
+            message.setText("Plese try other email, this have been");
+            message.setIcon(QMessageBox::Warning);
+            message.exec();
+        }
     }
 }
 
@@ -105,23 +148,13 @@ void MainWindow::on_newPasswordLE_textChanged(const QString &arg1)
     enableSingUpPB();
 }
 
+//Cuando se presiona el boton signUpPB
 void MainWindow::on_signUpPB_clicked()
 {
-    QMessageBox message;
-    User u;
-    u.setUsername(ui->newUserLE->text());
-    u.setEmail(ui->emailLE->text());
-    u.setPassword(ui->newPasswordLE->text());
-
-    users.push_back(u);
-
-    message.setText("New user created");
-    message.exec();
-
+    validateCredential();
     ui->newUserLE->clear();
-    ui->emailLE->clear();
     ui->newPasswordLE->clear();
-
+    ui->emailLE->clear();
 }
 
 void MainWindow::on_loginPB_clicked()
