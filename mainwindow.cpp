@@ -13,6 +13,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+//Habilitar el boton login push Botton
 void MainWindow::enableLoginPB()
 {
     if(ui->usernameLE->text().length() > 0 &&
@@ -26,6 +27,7 @@ void MainWindow::enableLoginPB()
     }
 }
 
+//Habilitar el boton login push Botton
 void MainWindow::enableSingUpPB()
 {
     if(ui->newUserLE->text().length() > 0 &&
@@ -41,6 +43,7 @@ void MainWindow::enableSingUpPB()
 
 }
 
+//Busca si el usuario que se ingreso ya esta registrado para iniciar sesion
 void MainWindow::validateUser()
 {
     QMessageBox message;
