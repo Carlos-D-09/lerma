@@ -43,7 +43,7 @@ void MainWindow::enableSingUpPB()
 
 }
 
-//Busca si el usuario que se ingreso ya esta registrado para iniciar sesion
+//Busca si el usuario que se ingreso ya esta registrado para iniciar sesión
 void MainWindow::validateUser()
 {
     QMessageBox message;
@@ -51,28 +51,200 @@ void MainWindow::validateUser()
     QString user = ui->usernameLE->text();
     QString password = ui->passwordLE->text();
 
-    it = find_if(users.begin(), users.end(), [&user, &password](User u) -> bool
+    it = find_if(users.begin(), users.end(), [&user](User u) -> bool
     {
-        return u.getUsername() == user && u.getPassword() == password;
+        return u.getUsername() == user;
     }
         );
+    //Si el iterador termina al final es que no hay ningun usuario registrado con ese nombre
     if (it == users.end())
     {
         message.setText("Invalid credentials");
         message.setIcon(QMessageBox::Warning);
-        //message.layout();
         message.exec();
+
+        ui->usernameLE->clear();
+        ui->passwordLE->clear();
+    }
+    //En caso contrario paso a evaluar si hay coincidencia en la contraseña
+    else
+    {
+        it = find_if(users.begin(), users.end(), [&password](User u) -> bool
+        {
+            return u.getPassword() == password;
+        }
+            );
+        if(it == users.end())
+        {
+            message.setText("Incorrect password, please try again");
+            message.setIcon(QMessageBox::Warning);
+            message.exec();
+
+            ui->passwordLE->clear();
+        }
+        else
+        {
+            message.setText("Welcome to LERMA " + user);
+            ui->viewSW->setCurrentIndex(1);
+            /*Lo que hace es cambiar la pantalla de la aplicación, por defecto la primera
+            empieza en 0, que en este caso es la pantalla de inicio de sesión
+            */
+            message.exec();
+        }
+    }
+}
+
+//Metodo para corroborar la dirección de correo electronico
+bool MainWindow::checkEmail(const QString &value)
+{
+    bool result = true; //Variable que voy a retornar
+    char a = 64, b = 46;
+    if(value.contains(a) && value.contains(b)) //Evaluo si contiene un @ y .
+    {
+        int cont = 0; //cont es la variable que llevara el conteo de cuantas veces aparece el @
+        int pos1, pos2; //pos1 es la posición donde se encontro el ultimo '@' y pos2 donde se encontro el ultimo '.'
+        int letters = 0; //contador para saber si hay caracteres antes del @
+        for (int x = 0; x < value.size(); x++)
+        {
+            if(value[x] != a && cont == 0)
+            {
+                letters++;
+            }
+            else if(value[x] == a)
+            {
+                pos1 = x;
+                cont++;
+            }
+            else if (value[x] == b)
+            {
+                pos2 = x;
+            }
+        }
+        if(letters == 0) //En caso de que no haya nada escrito antes del @
+        {
+            result = false;
+        }
+        else if(cont > 1) //En caso de que haya dos @
+        {
+            result = false;
+        }
+        else if(pos1 > pos2) //En caso de que no haya un . despues del @
+        {
+            result = false;
+        }
+        else if(pos1 + 1 == pos2) //En caso de que el @ y el . esten juntos
+        {
+            result = false;
+        }
+        else //Para evaluar que no haya caracteres especiales dentro del correo
+        {
+            for (int c = 32; c < 129; c++)
+            {
+                char x = c;
+                if(c < 42)
+                {
+                    if(value.contains(x) == true)
+                    {
+                        result = false;
+                        break;
+                    }
+                }
+                else if(c == 44 || c == 58 || c == 59 || c == 60 || c == 62 || c == 91 || c == 92 || c == 93 || c == 96 || c == 124 || c == 128)
+                {
+                    if(value.contains(x) == true)
+                    {
+                        result = false;
+                        break;
+                    }
+                }
+            }
+        }
     }
     else
     {
-        message.setText("Welcome to LERMA " + user);
-        ui->viewSW->setCurrentIndex(1);
-        /*Lo que hace es cambiar la pantalla de la aplicación, por defecto la primera
-        empieza en 0, que en este caso es la pantalla de inicio de sesión
-        */
+        result = false;
+    }
+
+    return result;
+}
+
+//Metodo para identificar repeticiones de datos al momento de crear un nuevo usuaio
+void MainWindow::validateData()
+{
+    QMessageBox message;
+    QString user = ui->newUserLE->text();
+    QString email = ui->emailLE->text();
+    //Si el email introducidio es valido
+    if(checkEmail(email) == true)
+    {
+        //Busca que no haya un nombre de usuario o email en el vector users
+        vector <User> :: iterator it; //iterador para la función find it
+        it = find_if(users.begin(),users.end(),[&user, &email](User u) -> bool
+        {
+            return (u.getUsername() == user || u.getEmail() == email);
+        }
+            );
+
+        //Si no lo hay, registra el usuario sin problema
+        if(it == users.end())
+        {
+            User u;
+            u.setUsername(ui->newUserLE->text());
+            u.setEmail(ui->emailLE->text());
+            u.setPassword(ui->newPasswordLE->text());
+
+            users.push_back(u);
+            message.setText("New user created");
+            message.exec();
+            ui->newUserLE->clear();
+            ui->newPasswordLE->clear();
+            ui->emailLE->clear();
+        }
+        else
+        {
+            User u = *it;
+
+            //En caso que se este tratando de registrar un usuario ya creado
+            if(u.getUsername() == user && u.getEmail() == email)
+            {
+                message.setText("This user is already registred");
+                message.setIcon(QMessageBox::Warning);
+                message.exec();
+                ui->newUserLE->clear();
+                ui->newPasswordLE->clear();
+                ui->emailLE->clear();
+
+            }
+
+            //En caso de que se quiera usar un nombre de usuario ya registrado
+            else if (u.getUsername() == user)
+            {
+                message.setText("please try another username this has already been registered");
+                message.setIcon(QMessageBox::Warning);
+                message.exec();
+                ui->newUserLE->clear();
+            }
+
+            //En caso de que se quiera usar un correo electronico ya registrado
+            else if(u.getEmail() == email)
+            {
+                message.setText("please try another email this has already been registered");
+                message.setIcon(QMessageBox::Warning);
+                message.exec();
+            }
+        }
+    }
+
+    //En caso de que la dirección de correo electronico no sea valida
+    else
+    {
+        message.setText("Invalid email adress");
+        message.setIcon(QMessageBox::Warning);
         message.exec();
+        ui->emailLE->setModified(true);
     }
 }
+
 
 //viewSW (verStackedWidget)Son todos de slots
 
@@ -108,28 +280,13 @@ void MainWindow::on_newPasswordLE_textChanged(const QString &arg1)
     enableSingUpPB();
 }
 
+//Accion cuando se presiona el boton signUpPB
 void MainWindow::on_signUpPB_clicked()
 {
-    QMessageBox message;
-    User u;
-    u.setUsername(ui->newUserLE->text());
-    u.setEmail(ui->emailLE->text());
-    u.setPassword(ui->newPasswordLE->text());
-
-    users.push_back(u);
-
-    message.setText("New user created");
-    message.exec();
-
-    ui->newUserLE->clear();
-    ui->emailLE->clear();
-    ui->newPasswordLE->clear();
-
+    validateData();
 }
 
 void MainWindow::on_loginPB_clicked()
 {
     validateUser();
-    ui->usernameLE->clear();
-    ui->passwordLE->clear();
 }

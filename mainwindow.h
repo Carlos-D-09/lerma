@@ -43,7 +43,8 @@ private:
     void enableLoginPB();
     void enableSingUpPB();
     void validateUser();
-
+    void validateData();
+    bool checkEmail(const QString &value);
 };
 
 #endif // MAINWINDOW_H
