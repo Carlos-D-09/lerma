@@ -40,7 +40,6 @@ void MainWindow::enableSingUpPB()
     {
         ui->signUpPB->setEnabled(false);
     }
-
 }
 
 //Busca si el usuario que se ingreso ya esta registrado para iniciar sesión
@@ -102,13 +101,21 @@ bool MainWindow::checkEmail(const QString &value)
     if(value.contains(a) && value.contains(b)) //Evaluo si contiene un @ y .
     {
         int cont = 0; //cont es la variable que llevara el conteo de cuantas veces aparece el @
-        int pos1, pos2; //pos1 es la posición donde se encontro el ultimo '@' y pos2 donde se encontro el ultimo '.'
+        int pos1 = 0, pos2 = 0; //pos1 es la posición donde se encontro el ultimo '@' y pos2 donde se encontro el ultimo '.'
         int letters = 0; //contador para saber si hay caracteres antes del @
         for (int x = 0; x < value.size(); x++)
         {
             if(value[x] != a && cont == 0)
             {
-                letters++;
+                if(value[x] == b)
+                {
+                    pos2 = x;
+                    letters++;
+                }
+                else
+                {
+                    letters++;
+                }
             }
             else if(value[x] == a)
             {
@@ -241,7 +248,7 @@ void MainWindow::validateData()
         message.setText("Invalid email adress");
         message.setIcon(QMessageBox::Warning);
         message.exec();
-        ui->emailLE->setModified(true);
+        //ui->emailLE->setModified(true);
     }
 }
 
