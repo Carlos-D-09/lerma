@@ -6,6 +6,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    openFileAction = new QAction ("&Open Database", this);
+
+    //Detecta cuando haya una señal, sus argumentos son: quien emite la señal, cual es la señal, quien responde, con que le responde
+    connect(openFileAction, SIGNAL(triggered()),this, SLOT(openFile()));
+    ui->menuBar->addMenu("&File")->addAction(openFileAction);
+
+    //Que se genere el archivo .json
+    dbFile.setFileName("lerma.json");
+    dbFile.open(QIODevice::WriteOnly);
+    dbFile.close();
 }
 
 MainWindow::~MainWindow()
@@ -175,6 +186,16 @@ bool MainWindow::checkEmail(const QString &value)
     return result;
 }
 
+void MainWindow::saveDB()
+{
+
+}
+
+void MainWindow::loadDB()
+{
+
+}
+
 //Metodo para identificar repeticiones de datos al momento de crear un nuevo usuaio
 void MainWindow::validateData()
 {
@@ -248,7 +269,6 @@ void MainWindow::validateData()
         message.setText("Invalid email adress");
         message.setIcon(QMessageBox::Warning);
         message.exec();
-        //ui->emailLE->setModified(true);
     }
 }
 
@@ -296,4 +316,9 @@ void MainWindow::on_signUpPB_clicked()
 void MainWindow::on_loginPB_clicked()
 {
     validateUser();
+}
+
+void MainWindow::openFile()
+{
+
 }
