@@ -13,14 +13,17 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(openFileAction, SIGNAL(triggered()),this, SLOT(openFile()));
     ui->menuBar->addMenu("&File")->addAction(openFileAction);
 
-    //Que se genere el archivo .json
-    dbFile.setFileName("lerma.json");
-    dbFile.open(QIODevice::WriteOnly);
-    dbFile.close();
+    /*
+     * Que se genere el archivo .json
+        dbFile.setFileName("lerma.json");
+        dbFile.open(QIODevice::WriteOnly);
+        dbFile.close();
+    */
 }
 
 MainWindow::~MainWindow()
 {
+    saveDB();
     delete ui;
 }
 
@@ -188,17 +191,44 @@ bool MainWindow::checkEmail(const QString &value)
 
 void MainWindow::saveDB()
 {
+    QJsonObject jsonObj;
+    QJsonDocument jsonDoc;
+    jsonObj["users"] = dbArray;
+    jsonDoc = QJsonDocument(jsonObj);
 
+    dbFile.open(QIODevice::WriteOnly);
+    dbFile.write(jsonDoc.toJson());
+    dbFile.close();
 }
 
 void MainWindow::loadDB()
 {
+    QJsonObject jsonObj;
+    QJsonDocument jsonDoc;
+    QByteArray data;
 
+    dbFile.open(QIODevice::ReadOnly);
+    data = dbFile.readAll();
+    dbFile.close();
+    jsonDoc = QJsonDocument::fromJson(data);
+    jsonObj = jsonDoc.object();
+    dbArray = jsonObj["users"].toArray();
+
+    for (int i(0); i < dbArray.size(); i++)
+    {
+        User u;
+        QJsonObject obj = dbArray[i].toObject();
+        u.setUsername(obj["name"].toString());
+        u.setEmail(obj["email"].toString());
+        u.setPassword(obj["password"].toString());
+        users.push_back(u);
+    }
 }
 
 //Metodo para identificar repeticiones de datos al momento de crear un nuevo usuaio
 void MainWindow::validateData()
 {
+    QJsonObject jsonObj;
     QMessageBox message;
     QString user = ui->newUserLE->text();
     QString email = ui->emailLE->text();
@@ -227,6 +257,12 @@ void MainWindow::validateData()
             ui->newUserLE->clear();
             ui->newPasswordLE->clear();
             ui->emailLE->clear();
+
+            //Se agrega al final del arreglo json el usuario registrado
+            jsonObj["name"] = u.getUsername();
+            jsonObj["email"] = u.getEmail();
+            jsonObj["password"] = u.getPassword();
+            dbArray.append(jsonObj);
         }
         else
         {
@@ -259,6 +295,7 @@ void MainWindow::validateData()
                 message.setText("please try another email this has already been registered");
                 message.setIcon(QMessageBox::Warning);
                 message.exec();
+                ui->emailLE->clear();
             }
         }
     }
@@ -320,5 +357,16 @@ void MainWindow::on_loginPB_clicked()
 
 void MainWindow::openFile()
 {
-
+    QString name;
+    //Busca el archivo dentro del sistema de archivos, recibe como argumentos:
+    //el widget, la leyenda que aparecera, donde se empieza la busqueda
+    //("" para que se busque en la carpeta contenedora del ejecutable),cual es el filtro que se aplica
+    name = QFileDialog::getOpenFileName(this,"Select Databes","","JSON files (*.json)");
+    if (name.length() > 0)
+    {
+        dbFile.setFileName(name);
+        ui->loginGB->setEnabled(true);
+        ui->signUpGB->setEnabled(true);
+        loadDB();
+    }
 }
