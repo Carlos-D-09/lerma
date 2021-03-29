@@ -5,12 +5,14 @@
 #include <QMessageBox>
 #include <vector>
 #include "user.h"
+#include "productwidget.h"
 #include <QAction>
 #include <QFile>
 #include <QFileDialog>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <iomanip>
 
 using namespace std;
 
@@ -47,9 +49,11 @@ private:
     Ui::MainWindow *ui;
 
     vector<User> users;
+    vector<Product> products;
     QAction* openFileAction;
     QFile dbFile;
-    QJsonArray dbArray;
+    QJsonArray dbU_Array;
+    QJsonArray dbP_Array;
 
     void enableLoginPB();
     void enableSingUpPB();

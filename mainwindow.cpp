@@ -193,7 +193,8 @@ void MainWindow::saveDB()
 {
     QJsonObject jsonObj;
     QJsonDocument jsonDoc;
-    jsonObj["users"] = dbArray;
+    jsonObj["users"] = dbU_Array;
+    jsonObj["products"] = dbP_Array;
     jsonDoc = QJsonDocument(jsonObj);
 
     dbFile.open(QIODevice::WriteOnly);
@@ -212,16 +213,29 @@ void MainWindow::loadDB()
     dbFile.close(); //cierro el archivo
     jsonDoc = QJsonDocument::fromJson(data); //transformo de binario a json
     jsonObj = jsonDoc.object(); //transofrmo del docuemento a un arreglo de .json
-    dbArray = jsonObj["users"].toArray(); //hago que jsonObj en su registro users contenga el arreglo de usuarios y se lo asigna a un arreglo .json
 
-    for (int i(0); i < dbArray.size(); i++)
+    //cargar la base de datos de los productos
+    dbU_Array = jsonObj["users"].toArray(); //hago que jsonObj en su registro users contenga el arreglo de usuarios y se lo asigna a un arreglo .json
+
+    for (int i(0); i < dbU_Array.size(); i++)
     {
         User u; //creo un objeto u de la clase User
-        QJsonObject obj = dbArray[i].toObject(); //Extraigo del arreglo .json posición i, la transformo en un objeto json y la asigno a obj
+        QJsonObject obj = dbU_Array[i].toObject(); //Extraigo del arreglo .json posición i, la transformo en un objeto json y la asigno a obj
         u.setUsername(obj["name"].toString()); //De un QJsonObj conviero a un string de c++
         u.setEmail(obj["email"].toString());
         u.setPassword(obj["password"].toString());
         users.push_back(u);
+    }
+    //Cargar la base de datos de los productos;
+    dbP_Array = jsonObj["products"].toArray();
+
+    for(int i(0); i < dbP_Array.size(); i++){
+        Product u; //creo un objeto u de la clase product
+        QJsonObject obj = dbP_Array[i].toObject(); //Extraigo del arreglo .json posición i, la transformo en un objeto json y la asigno a obj
+        u.setId(obj["id"].toString()); //De un QJsonObj conviero a un string de c++
+        u.setName(obj["name"].toString());
+        u.setPrice((float)obj["price"].toDouble());
+        products.push_back(u);
     }
 }
 
@@ -262,7 +276,7 @@ void MainWindow::validateData()
             jsonObj["name"] = u.getUsername();
             jsonObj["email"] = u.getEmail();
             jsonObj["password"] = u.getPassword();
-            dbArray.append(jsonObj);
+            dbU_Array.append(jsonObj);
         }
         else
         {
