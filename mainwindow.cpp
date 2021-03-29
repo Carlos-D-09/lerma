@@ -111,7 +111,7 @@ void MainWindow::validateUser()
 bool MainWindow::checkEmail(const QString &value)
 {
     bool result = true; //Variable que voy a retornar
-    char a = 64, b = 46;
+    char a = 64, b = 46; //Caracteres @ y . en código ascii
     if(value.contains(a) && value.contains(b)) //Evaluo si contiene un @ y .
     {
         int cont = 0; //cont es la variable que llevara el conteo de cuantas veces aparece el @
@@ -228,7 +228,6 @@ void MainWindow::loadDB()
 //Metodo para identificar repeticiones de datos al momento de crear un nuevo usuaio
 void MainWindow::validateData()
 {
-    QJsonObject jsonObj;
     QMessageBox message;
     QString user = ui->newUserLE->text();
     QString email = ui->emailLE->text();
@@ -236,7 +235,7 @@ void MainWindow::validateData()
     if(checkEmail(email) == true)
     {
         //Busca que no haya un nombre de usuario o email en el vector users
-        vector <User> :: iterator it; //iterador para la función find it
+        vector <User> :: iterator it; //iterador para la función find if
         it = find_if(users.begin(),users.end(),[&user, &email](User u) -> bool
         {
             return (u.getUsername() == user || u.getEmail() == email);
@@ -246,6 +245,7 @@ void MainWindow::validateData()
         //Si no lo hay, registra el usuario sin problema
         if(it == users.end())
         {
+            QJsonObject jsonObj;
             User u;
             u.setUsername(ui->newUserLE->text());
             u.setEmail(ui->emailLE->text());
@@ -361,7 +361,8 @@ void MainWindow::openFile()
     //Busca el archivo dentro del sistema de archivos, recibe como argumentos:
     //el widget, la leyenda que aparecera, donde se empieza la busqueda
     //("" para que se busque en la carpeta contenedora del ejecutable),cual es el filtro que se aplica
-    name = QFileDialog::getOpenFileName(this,"Select Databes","","JSON files (*.json)");
+    name = QFileDialog::getOpenFileName(this,"Select Database","","JSON files (*.json)");
+
     if (name.length() > 0)
     {
         dbFile.setFileName(name);
