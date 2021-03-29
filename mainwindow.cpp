@@ -207,18 +207,18 @@ void MainWindow::loadDB()
     QJsonDocument jsonDoc;
     QByteArray data;
 
-    dbFile.open(QIODevice::ReadOnly);
-    data = dbFile.readAll();
-    dbFile.close();
-    jsonDoc = QJsonDocument::fromJson(data);
-    jsonObj = jsonDoc.object();
-    dbArray = jsonObj["users"].toArray();
+    dbFile.open(QIODevice::ReadOnly); //Abro un flujo de lectura
+    data = dbFile.readAll(); //Asigno a data el valor binario de la lectura del archivo
+    dbFile.close(); //cierro el archivo
+    jsonDoc = QJsonDocument::fromJson(data); //transformo de binario a json
+    jsonObj = jsonDoc.object(); //transofrmo del docuemento a un arreglo de .json
+    dbArray = jsonObj["users"].toArray(); //hago que jsonObj en su registro users contenga el arreglo de usuarios y se lo asigna a un arreglo .json
 
     for (int i(0); i < dbArray.size(); i++)
     {
-        User u;
-        QJsonObject obj = dbArray[i].toObject();
-        u.setUsername(obj["name"].toString());
+        User u; //creo un objeto u de la clase User
+        QJsonObject obj = dbArray[i].toObject(); //Extraigo del arreglo .json posición i, la transformo en un objeto json y la asigno a obj
+        u.setUsername(obj["name"].toString()); //De un QJsonObj conviero a un string de c++
         u.setEmail(obj["email"].toString());
         u.setPassword(obj["password"].toString());
         users.push_back(u);
