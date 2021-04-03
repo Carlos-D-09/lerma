@@ -13,6 +13,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(openFileAction, SIGNAL(triggered()),this, SLOT(openFile()));
     ui->menuBar->addMenu("&File")->addAction(openFileAction);
 
+    ui->categories->addItem("All departments");
+    ui->categories->addItem("Food and drinks");
+    ui->categories->addItem("Books");
+    ui->categories->addItem("Electronic");
+    ui->categories->addItem("Home");
+    ui->categories->addItem("Sports and outdoors");
+
     /*
      * Que se genere el archivo .json
         dbFile.setFileName("lerma.json");
@@ -99,6 +106,8 @@ void MainWindow::validateUser()
         {
             message.setText("Welcome to LERMA " + user);
             ui->viewSW->setCurrentIndex(1);
+            ui->categories->setEnabled(true);
+            on_categories_activated("");
             /*Lo que hace es cambiar la pantalla de la aplicación, por defecto la primera
             empieza en 0, que en este caso es la pantalla de inicio de sesión
             */
@@ -193,7 +202,7 @@ void MainWindow::saveDB()
 {
     QJsonObject jsonObj;
     QJsonDocument jsonDoc;
-    jsonObj["users"] = dbArray;
+    jsonObj["users"] = dbuArray;
     jsonDoc = QJsonDocument(jsonObj);
 
     dbFile.open(QIODevice::WriteOnly);
@@ -212,12 +221,12 @@ void MainWindow::loadDB()
     dbFile.close(); //cierro el archivo
     jsonDoc = QJsonDocument::fromJson(data); //transformo de binario a json
     jsonObj = jsonDoc.object(); //transofrmo del docuemento a un arreglo de .json
-    dbArray = jsonObj["users"].toArray(); //hago que jsonObj en su registro users contenga el arreglo de usuarios y se lo asigna a un arreglo .json
+    dbuArray = jsonObj["users"].toArray(); //hago que jsonObj en su registro users contenga el arreglo de usuarios y se lo asigna a un arreglo .json
 
-    for (int i(0); i < dbArray.size(); i++)
+    for (int i(0); i < dbuArray.size(); i++)
     {
         User u; //creo un objeto u de la clase User
-        QJsonObject obj = dbArray[i].toObject(); //Extraigo del arreglo .json posición i, la transformo en un objeto json y la asigno a obj
+        QJsonObject obj = dbuArray[i].toObject(); //Extraigo del arreglo .json posición i, la transformo en un objeto json y la asigno a obj
         u.setUsername(obj["name"].toString()); //De un QJsonObj conviero a un string de c++
         u.setEmail(obj["email"].toString());
         u.setPassword(obj["password"].toString());
@@ -262,7 +271,7 @@ void MainWindow::validateData()
             jsonObj["name"] = u.getUsername();
             jsonObj["email"] = u.getEmail();
             jsonObj["password"] = u.getPassword();
-            dbArray.append(jsonObj);
+            dbuArray.append(jsonObj);
         }
         else
         {
@@ -370,4 +379,15 @@ void MainWindow::openFile()
         ui->signUpGB->setEnabled(true);
         loadDB();
     }
+}
+
+
+void MainWindow::on_categories_activated(const QString &arg1)
+{
+    Q_UNUSED (arg1);
+    QString id = "AB01";
+    QString name = "McCormick, Mermelada, 165 gramos";
+    float price = 29.81;
+    productInfo = new productWidget (this, id, name, price);
+    productInfo->show();
 }

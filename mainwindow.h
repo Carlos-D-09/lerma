@@ -4,7 +4,9 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <vector>
+#include <QVector>
 #include "user.h"
+#include "productwidget.h"
 #include <QAction>
 #include <QFile>
 #include <QFileDialog>
@@ -13,6 +15,8 @@
 #include <QJsonDocument>
 
 using namespace std;
+
+class productWidget;
 
 namespace Ui {
 class MainWindow;
@@ -43,13 +47,16 @@ private slots:
 
     void openFile();
 
+    void on_categories_activated(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
 
     vector<User> users;
     QAction* openFileAction;
     QFile dbFile;
-    QJsonArray dbArray;
+    QJsonArray dbuArray;
+    productWidget *productInfo;
 
     void enableLoginPB();
     void enableSingUpPB();
