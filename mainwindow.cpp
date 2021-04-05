@@ -106,12 +106,13 @@ void MainWindow::validateUser()
         {
             message.setText("Welcome to LERMA " + user);
             ui->viewSW->setCurrentIndex(1);
+            message.exec();
             ui->categories->setEnabled(true);
+            QMainWindow::showMaximized();
             on_categories_activated("");
             /*Lo que hace es cambiar la pantalla de la aplicación, por defecto la primera
             empieza en 0, que en este caso es la pantalla de inicio de sesión
             */
-            message.exec();
         }
     }
 }
@@ -385,9 +386,29 @@ void MainWindow::openFile()
 void MainWindow::on_categories_activated(const QString &arg1)
 {
     Q_UNUSED (arg1);
+
     QString id = "AB01";
     QString name = "McCormick, Mermelada, 165 gramos";
     float price = 29.81;
     productInfo = new productWidget (this, id, name, price);
-    productInfo->show();
+    ui->gridProducts->addWidget(productInfo,0,0);
+
+    id = "AB02";
+    name = "Herdez Atún en Aceite, 295 g";
+    price = 36.82;
+    productInfo = new productWidget (this, id, name, price);
+    ui->gridProducts->addWidget(productInfo,0,1);
+
+    id = "AB03";
+    name = "Maggi, Hojas sazonadoras, 4 piezas";
+    price = 11.36;
+    productInfo = new productWidget (this, id, name, price);
+    ui->gridProducts->addWidget(productInfo,0,2);
+
+    id = "AB04";
+    name = "Nescafe,Café soluble, 120 gramos";
+    price = 59;
+    productInfo = new productWidget (this, id, name, price);
+    ui->gridProducts->addWidget(productInfo,0,3);
+
 }

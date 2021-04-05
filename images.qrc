@@ -1,1 +1,54 @@
-<RCC/>
+<RCC>
+    <qresource prefix="/">
+        <file>Productos/imgs/AB01.jpg</file>
+        <file>Productos/imgs/AB02.jpg</file>
+        <file>Productos/imgs/AB03.jpg</file>
+        <file>Productos/imgs/AB04.jpg</file>
+        <file>Productos/imgs/AB05.jpg</file>
+        <file>Productos/imgs/AB06.jpg</file>
+        <file>Productos/imgs/AB07.jpg</file>
+        <file>Productos/imgs/AB08.jpg</file>
+        <file>Productos/imgs/AB09.jpg</file>
+        <file>Productos/imgs/AB10.jpg</file>
+        <file>Productos/imgs/D01.jpg</file>
+        <file>Productos/imgs/D02.jpg</file>
+        <file>Productos/imgs/D03.jpg</file>
+        <file>Productos/imgs/D04.jpg</file>
+        <file>Productos/imgs/D05.jpg</file>
+        <file>Productos/imgs/D06.jpg</file>
+        <file>Productos/imgs/D07.jpg</file>
+        <file>Productos/imgs/D08.jpg</file>
+        <file>Productos/imgs/D09.jpg</file>
+        <file>Productos/imgs/D10.jpg</file>
+        <file>Productos/imgs/E01.jpg</file>
+        <file>Productos/imgs/E02.jpg</file>
+        <file>Productos/imgs/E03.jpg</file>
+        <file>Productos/imgs/E04.jpg</file>
+        <file>Productos/imgs/E05.jpg</file>
+        <file>Productos/imgs/E06.jpg</file>
+        <file>Productos/imgs/E07.jpg</file>
+        <file>Productos/imgs/E08.jpg</file>
+        <file>Productos/imgs/E09.jpg</file>
+        <file>Productos/imgs/E10.jpg</file>
+        <file>Productos/imgs/HC01.jpg</file>
+        <file>Productos/imgs/HC02.jpg</file>
+        <file>Productos/imgs/HC03.jpg</file>
+        <file>Productos/imgs/HC04.jpg</file>
+        <file>Productos/imgs/HC05.jpg</file>
+        <file>Productos/imgs/HC06.jpg</file>
+        <file>Productos/imgs/HC07.jpg</file>
+        <file>Productos/imgs/HC08.jpg</file>
+        <file>Productos/imgs/HC09.jpg</file>
+        <file>Productos/imgs/HC10.jpg</file>
+        <file>Productos/imgs/L01.jpg</file>
+        <file>Productos/imgs/L02.jpg</file>
+        <file>Productos/imgs/L03.jpg</file>
+        <file>Productos/imgs/L04.jpg</file>
+        <file>Productos/imgs/L05.jpg</file>
+        <file>Productos/imgs/L06.jpg</file>
+        <file>Productos/imgs/L07.jpg</file>
+        <file>Productos/imgs/L08.jpg</file>
+        <file>Productos/imgs/L09.jpg</file>
+        <file>Productos/imgs/L10.jpg</file>
+    </qresource>
+</RCC>

@@ -53,9 +53,11 @@ private:
     Ui::MainWindow *ui;
 
     vector<User> users;
+    //vector<*productWidget> products;
     QAction* openFileAction;
     QFile dbFile;
     QJsonArray dbuArray;
+    QJsonArray dbpArray;
     productWidget *productInfo;
 
     void enableLoginPB();

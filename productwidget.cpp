@@ -9,8 +9,7 @@ productWidget::productWidget(QWidget *parent, QString id, QString name, float pr
     ui->setupUi(this);
     QPixmap pix(":/Productos/imgs/"+ id);
     ui->productImage->setPixmap(pix);
-    ui->productDescription->setText(name);
-    ui->productPrice->setText(QString::number(price));
+    ui->productDescription->setText(name + "\n" + "$ " + QString::number(price));
 }
 
 productWidget::~productWidget()
