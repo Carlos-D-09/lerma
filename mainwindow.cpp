@@ -13,6 +13,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(openFileAction, SIGNAL(triggered()),this, SLOT(openFile()));
     ui->menuBar->addMenu("&File")->addAction(openFileAction);
 
+    ui->categories->addItem("All departments");
+    ui->categories->addItem("Food and drinks");
+    ui->categories->addItem("Books");
+    ui->categories->addItem("Electronic");
+    ui->categories->addItem("Home");
+    ui->categories->addItem("Sports and outdoors");
+
     /*
      * Que se genere el archivo .json
         dbFile.setFileName("lerma.json");
@@ -99,10 +106,13 @@ void MainWindow::validateUser()
         {
             message.setText("Welcome to LERMA " + user);
             ui->viewSW->setCurrentIndex(1);
+            message.exec();
+            ui->categories->setEnabled(true);
+            QMainWindow::showMaximized();
+            on_categories_activated("");
             /*Lo que hace es cambiar la pantalla de la aplicación, por defecto la primera
             empieza en 0, que en este caso es la pantalla de inicio de sesión
             */
-            message.exec();
         }
     }
 }
@@ -193,8 +203,12 @@ void MainWindow::saveDB()
 {
     QJsonObject jsonObj;
     QJsonDocument jsonDoc;
+<<<<<<< HEAD
     jsonObj["users"] = dbU_Array;
     jsonObj["products"] = dbP_Array;
+=======
+    jsonObj["users"] = dbuArray;
+>>>>>>> widget_interfaz_grafica
     jsonDoc = QJsonDocument(jsonObj);
 
     dbFile.open(QIODevice::WriteOnly);
@@ -213,6 +227,7 @@ void MainWindow::loadDB()
     dbFile.close(); //cierro el archivo
     jsonDoc = QJsonDocument::fromJson(data); //transformo de binario a json
     jsonObj = jsonDoc.object(); //transofrmo del docuemento a un arreglo de .json
+<<<<<<< HEAD
 
     //cargar la base de datos de los productos
     dbU_Array = jsonObj["users"].toArray(); //hago que jsonObj en su registro users contenga el arreglo de usuarios y se lo asigna a un arreglo .json
@@ -221,6 +236,14 @@ void MainWindow::loadDB()
     {
         User u; //creo un objeto u de la clase User
         QJsonObject obj = dbU_Array[i].toObject(); //Extraigo del arreglo .json posición i, la transformo en un objeto json y la asigno a obj
+=======
+    dbuArray = jsonObj["users"].toArray(); //hago que jsonObj en su registro users contenga el arreglo de usuarios y se lo asigna a un arreglo .json
+
+    for (int i(0); i < dbuArray.size(); i++)
+    {
+        User u; //creo un objeto u de la clase User
+        QJsonObject obj = dbuArray[i].toObject(); //Extraigo del arreglo .json posición i, la transformo en un objeto json y la asigno a obj
+>>>>>>> widget_interfaz_grafica
         u.setUsername(obj["name"].toString()); //De un QJsonObj conviero a un string de c++
         u.setEmail(obj["email"].toString());
         u.setPassword(obj["password"].toString());
@@ -276,7 +299,11 @@ void MainWindow::validateData()
             jsonObj["name"] = u.getUsername();
             jsonObj["email"] = u.getEmail();
             jsonObj["password"] = u.getPassword();
+<<<<<<< HEAD
             dbU_Array.append(jsonObj);
+=======
+            dbuArray.append(jsonObj);
+>>>>>>> widget_interfaz_grafica
         }
         else
         {
@@ -384,4 +411,35 @@ void MainWindow::openFile()
         ui->signUpGB->setEnabled(true);
         loadDB();
     }
+}
+
+
+void MainWindow::on_categories_activated(const QString &arg1)
+{
+    Q_UNUSED (arg1);
+
+    QString id = "AB01";
+    QString name = "McCormick, Mermelada, 165 gramos";
+    float price = 29.81;
+    productInfo = new productWidget (this, id, name, price);
+    ui->gridProducts->addWidget(productInfo,0,0);
+
+    id = "AB02";
+    name = "Herdez Atún en Aceite, 295 g";
+    price = 36.82;
+    productInfo = new productWidget (this, id, name, price);
+    ui->gridProducts->addWidget(productInfo,0,1);
+
+    id = "AB03";
+    name = "Maggi, Hojas sazonadoras, 4 piezas";
+    price = 11.36;
+    productInfo = new productWidget (this, id, name, price);
+    ui->gridProducts->addWidget(productInfo,0,2);
+
+    id = "AB04";
+    name = "Nescafe,Café soluble, 120 gramos";
+    price = 59;
+    productInfo = new productWidget (this, id, name, price);
+    ui->gridProducts->addWidget(productInfo,0,3);
+
 }

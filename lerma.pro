@@ -21,4 +21,8 @@ HEADERS  += mainwindow.h \
     user.h \
     productwidget.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    productwidget.ui
+
+RESOURCES += \
+    images.qrc

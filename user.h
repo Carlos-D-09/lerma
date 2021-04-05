@@ -11,6 +11,7 @@ private:
     QString username;
     QString email;
     QString password;
+
 public:
     User();
 
