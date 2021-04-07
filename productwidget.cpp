@@ -1,8 +1,4 @@
 #include "productwidget.h"
-<<<<<<< HEAD
-
-QString Product::getId() const
-=======
 #include <QString>
 #include "ui_productwidget.h"
 
@@ -13,7 +9,8 @@ productWidget::productWidget(QWidget *parent, QString id, QString name, float pr
     ui->setupUi(this);
     QPixmap pix(":/Productos/imgs/"+ id);
     ui->productImage->setPixmap(pix);
-    ui->productDescription->setText(name + "\n" + "$ " + QString::number(price));
+    ui->productDescription->setText(name);
+    ui->productPrice->setText("$" + QString::number(price));
 }
 
 productWidget::~productWidget()
@@ -22,52 +19,30 @@ productWidget::~productWidget()
 }
 
 QString productWidget::getId() const
->>>>>>> widget_interfaz_grafica
 {
     return id;
 }
-
-<<<<<<< HEAD
-void Product::setId(const QString &value)
-=======
 void productWidget::setId(const QString &value)
->>>>>>> widget_interfaz_grafica
 {
     id = value;
+    QPixmap pix(":/Productos/imgs/" + id);
+    ui->productImage->setPixmap(pix);
 }
-
-<<<<<<< HEAD
-QString Product::getName() const
-=======
 QString productWidget::getName() const
->>>>>>> widget_interfaz_grafica
 {
     return name;
 }
-
-<<<<<<< HEAD
-void Product::setName(const QString &value)
-=======
 void productWidget::setName(const QString &value)
->>>>>>> widget_interfaz_grafica
 {
     name = value;
+    ui->productDescription->setText(name);
 }
-
-<<<<<<< HEAD
-float Product::getPrice() const
-=======
 float productWidget::getPrice() const
->>>>>>> widget_interfaz_grafica
 {
     return price;
 }
-
-<<<<<<< HEAD
-void Product::setPrice(const float &value)
-=======
-void productWidget::setPrice(float value)
->>>>>>> widget_interfaz_grafica
+void productWidget::setPrice(const double &value)
 {
-    price = value;
+    price = float(value);
+    ui->productPrice->setText("$" + QString::number(price));
 }

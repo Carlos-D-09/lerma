@@ -13,13 +13,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(openFileAction, SIGNAL(triggered()),this, SLOT(openFile()));
     ui->menuBar->addMenu("&File")->addAction(openFileAction);
 
-    ui->categories->addItem("All departments");
-    ui->categories->addItem("Food and drinks");
-    ui->categories->addItem("Books");
-    ui->categories->addItem("Electronic");
-    ui->categories->addItem("Home");
-    ui->categories->addItem("Sports and outdoors");
-
     /*
      * Que se genere el archivo .json
         dbFile.setFileName("lerma.json");
@@ -109,7 +102,8 @@ void MainWindow::validateUser()
             message.exec();
             ui->categories->setEnabled(true);
             QMainWindow::showMaximized();
-            on_categories_activated("");
+            ui->categories->setEnabled(true);
+            ui->categories->setCurrentIndex(0);
             /*Lo que hace es cambiar la pantalla de la aplicación, por defecto la primera
             empieza en 0, que en este caso es la pantalla de inicio de sesión
             */
@@ -203,12 +197,8 @@ void MainWindow::saveDB()
 {
     QJsonObject jsonObj;
     QJsonDocument jsonDoc;
-<<<<<<< HEAD
-    jsonObj["users"] = dbU_Array;
-    jsonObj["products"] = dbP_Array;
-=======
     jsonObj["users"] = dbuArray;
->>>>>>> widget_interfaz_grafica
+    jsonObj["products"] = dbpArray;
     jsonDoc = QJsonDocument(jsonObj);
 
     dbFile.open(QIODevice::WriteOnly);
@@ -227,38 +217,30 @@ void MainWindow::loadDB()
     dbFile.close(); //cierro el archivo
     jsonDoc = QJsonDocument::fromJson(data); //transformo de binario a json
     jsonObj = jsonDoc.object(); //transofrmo del docuemento a un arreglo de .json
-<<<<<<< HEAD
 
-    //cargar la base de datos de los productos
-    dbU_Array = jsonObj["users"].toArray(); //hago que jsonObj en su registro users contenga el arreglo de usuarios y se lo asigna a un arreglo .json
-
-    for (int i(0); i < dbU_Array.size(); i++)
-    {
-        User u; //creo un objeto u de la clase User
-        QJsonObject obj = dbU_Array[i].toObject(); //Extraigo del arreglo .json posición i, la transformo en un objeto json y la asigno a obj
-=======
     dbuArray = jsonObj["users"].toArray(); //hago que jsonObj en su registro users contenga el arreglo de usuarios y se lo asigna a un arreglo .json
 
     for (int i(0); i < dbuArray.size(); i++)
     {
         User u; //creo un objeto u de la clase User
         QJsonObject obj = dbuArray[i].toObject(); //Extraigo del arreglo .json posición i, la transformo en un objeto json y la asigno a obj
->>>>>>> widget_interfaz_grafica
         u.setUsername(obj["name"].toString()); //De un QJsonObj conviero a un string de c++
         u.setEmail(obj["email"].toString());
         u.setPassword(obj["password"].toString());
         users.push_back(u);
     }
-    //Cargar la base de datos de los productos;
-    dbP_Array = jsonObj["products"].toArray();
 
-    for(int i(0); i < dbP_Array.size(); i++){
-        Product u; //creo un objeto u de la clase product
-        QJsonObject obj = dbP_Array[i].toObject(); //Extraigo del arreglo .json posición i, la transformo en un objeto json y la asigno a obj
-        u.setId(obj["id"].toString()); //De un QJsonObj conviero a un string de c++
-        u.setName(obj["name"].toString());
-        u.setPrice((float)obj["price"].toDouble());
-        products.push_back(u);
+    dbpArray = jsonObj["products"].toArray();
+
+    for(int i(0); i < dbpArray.size(); i++)
+    {
+        productWidget* p;
+        QJsonObject obj = dbpArray[i].toObject();
+        p = new productWidget (this);
+        p->setId(obj["id"].toString());
+        p->setName(obj["name"].toString());
+        p->setPrice(obj["price"].toDouble());
+        products.push_back(p);
     }
 }
 
@@ -299,11 +281,7 @@ void MainWindow::validateData()
             jsonObj["name"] = u.getUsername();
             jsonObj["email"] = u.getEmail();
             jsonObj["password"] = u.getPassword();
-<<<<<<< HEAD
-            dbU_Array.append(jsonObj);
-=======
             dbuArray.append(jsonObj);
->>>>>>> widget_interfaz_grafica
         }
         else
         {
@@ -413,33 +391,211 @@ void MainWindow::openFile()
     }
 }
 
-
-void MainWindow::on_categories_activated(const QString &arg1)
+void MainWindow::setProducts()
 {
-    Q_UNUSED (arg1);
 
-    QString id = "AB01";
-    QString name = "McCormick, Mermelada, 165 gramos";
-    float price = 29.81;
-    productInfo = new productWidget (this, id, name, price);
-    ui->gridProducts->addWidget(productInfo,0,0);
+    for(int i(0); i < dbpArray.size(); i++)
+    {
+        productWidget* p;
+        QJsonObject obj = dbpArray[i].toObject();
+        p = new productWidget (this);
+        p->setId(obj["id"].toString());
+        p->setName(obj["name"].toString());
+        p->setPrice(obj["price"].toDouble());
+        products[i] = p;
+    }
+}
 
-    id = "AB02";
-    name = "Herdez Atún en Aceite, 295 g";
-    price = 36.82;
-    productInfo = new productWidget (this, id, name, price);
-    ui->gridProducts->addWidget(productInfo,0,1);
+void MainWindow::clearGrid()
+{
+    QLayoutItem *item;
+    while((item = ui->gridProducts->layout()->takeAt(0)) != nullptr)
+    {
+        delete item->widget();
+        delete item;
+    }
+}
 
-    id = "AB03";
-    name = "Maggi, Hojas sazonadoras, 4 piezas";
-    price = 11.36;
-    productInfo = new productWidget (this, id, name, price);
-    ui->gridProducts->addWidget(productInfo,0,2);
+void MainWindow::showAllDepartments(int cont)
+{
+    int x = 0, y = 0;
+    if(cont == 0)
+    {
+        for(size_t i = 0; i < products.size(); i++)
+        {
+            ui->gridProducts->addWidget(products[i], x, y);
+            y++;
+            if(y == 4)
+            {
+                y = 0;
+                x++;
+            }
+        }
+    }
+    else
+    {
+        clearGrid();
+        setProducts();
+        for(size_t i = 0; i < products.size(); i++)
+        {
+            ui->gridProducts->addWidget(products[i], x, y);
+            y++;
+            if(y == 4)
+            {
+                y = 0;
+                x++;
+            }
+        }
+    }
+}
 
-    id = "AB04";
-    name = "Nescafe,Café soluble, 120 gramos";
-    price = 59;
-    productInfo = new productWidget (this, id, name, price);
-    ui->gridProducts->addWidget(productInfo,0,3);
+void MainWindow::showFoodDrinks()
+{
+    clearGrid();
+    setProducts();
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "AB", 2) == 0)
+        {
+            ui->gridProducts->addWidget(obj, x, y);
+            y++;
+            if(y == 4)
+            {
+                y = 0;
+                x++;
+            }
+        }
+    }
+}
 
+void MainWindow::showBooks()
+{
+    clearGrid();
+    setProducts();
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "L", 1) == 0)
+        {
+            ui->gridProducts->addWidget(obj, x, y);
+            y++;
+            if(y == 4)
+            {
+                y = 0;
+                x++;
+            }
+        }
+    }
+}
+
+void MainWindow::showElectronics()
+{
+    clearGrid();
+    setProducts();
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "E", 1) == 0)
+        {
+            ui->gridProducts->addWidget(obj, x, y);
+            y++;
+            if(y == 4)
+            {
+                y = 0;
+                x++;
+            }
+        }
+    }
+}
+
+void MainWindow::showHomeKitchen()
+{
+    clearGrid();
+    setProducts();
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "HC", 2) == 0)
+        {
+            ui->gridProducts->addWidget(obj, x, y);
+            y++;
+            if(y == 4)
+            {
+                y = 0;
+                x++;
+            }
+        }
+    }
+}
+
+void MainWindow::showSportOutdoors()
+{
+    clearGrid();
+    setProducts();
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "D", 1) == 0)
+        {
+            ui->gridProducts->addWidget(obj, x, y);
+            y++;
+            if(y == 4)
+            {
+                y = 0;
+                x++;
+            }
+        }
+    }
+}
+
+void MainWindow::on_categories_currentIndexChanged(int index)
+{
+    switch (index)
+    {
+        case 0:
+            showAllDepartments(1);
+            break;
+        case 1:
+            showFoodDrinks();
+            break;
+        case 2:
+            showBooks();
+            break;
+        case 3:
+            showElectronics();
+            break;
+        case 4:
+            showHomeKitchen();
+            break;
+        case 5:
+            showSportOutdoors();
+            break;
+        default:
+            QMessageBox advice;
+            advice.setIcon(QMessageBox::Warning);
+            advice.setText("Something went wrong, please contact technical support");
+            advice.exec();
+            break;
+    }
 }

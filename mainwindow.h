@@ -14,6 +14,16 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <iomanip>
+#include <QMainWindow>
+#include <QMessageBox>
+#include <vector>
+#include <QVector>
+#include <user.h>
+#include "productwidget.h"
+#include <QAction>
+#include <QFile>
+#include <QFileDialog>
+#include <string>
 
 using namespace std;
 
@@ -48,26 +58,19 @@ private slots:
 
     void openFile();
 
-    void on_categories_activated(const QString &arg1);
+    void on_categories_currentIndexChanged(int index);
 
 private:
     Ui::MainWindow *ui;
 
     vector<User> users;
-<<<<<<< HEAD
-    vector<Product> products;
-    QAction* openFileAction;
-    QFile dbFile;
-    QJsonArray dbU_Array;
-    QJsonArray dbP_Array;
-=======
-    //vector<*productWidget> products;
+    vector<productWidget*> products;
+    vector<productWidget*> products_aux;
     QAction* openFileAction;
     QFile dbFile;
     QJsonArray dbuArray;
     QJsonArray dbpArray;
     productWidget *productInfo;
->>>>>>> widget_interfaz_grafica
 
     void enableLoginPB();
     void enableSingUpPB();
@@ -76,6 +79,14 @@ private:
     bool checkEmail(const QString &value);
     void saveDB();
     void loadDB();
+    void setProducts();
+    void clearGrid();
+    void showAllDepartments(int cont = 0);
+    void showFoodDrinks();
+    void showBooks();
+    void showElectronics();
+    void showHomeKitchen();
+    void showSportOutdoors();
 };
 
 #endif // MAINWINDOW_H

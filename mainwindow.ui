@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>909</width>
-    <height>659</height>
+    <width>795</width>
+    <height>626</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -159,46 +159,65 @@
       </widget>
       <widget class="QWidget" name="page_2">
        <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
+         <widget class="QComboBox" name="categories">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <item>
+           <property name="text">
+            <string>All departments</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Food and drinks</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Books</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Electronics</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Home and kitchen</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sports and outdoors</string>
+           </property>
+          </item>
+         </widget>
+        </item>
         <item row="1" column="0">
-         <widget class="QScrollArea" name="scrollArea">
-          <property name="verticalScrollBarPolicy">
-           <enum>Qt::ScrollBarAsNeeded</enum>
-          </property>
-          <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarAsNeeded</enum>
-          </property>
-          <property name="sizeAdjustPolicy">
-           <enum>QAbstractScrollArea::AdjustToContents</enum>
-          </property>
+         <widget class="QScrollArea" name="imagesByCategorie">
           <property name="widgetResizable">
            <bool>true</bool>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
           </property>
           <widget class="QWidget" name="areaContent">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>889</width>
-             <height>560</height>
+             <width>775</width>
+             <height>527</height>
             </rect>
            </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_6">
-            <property name="spacing">
-             <number>6</number>
-            </property>
+           <layout class="QGridLayout" name="gridLayout_7">
             <item row="0" column="0">
              <layout class="QGridLayout" name="gridProducts">
-              <property name="sizeConstraint">
-               <enum>QLayout::SetDefaultConstraint</enum>
-              </property>
               <property name="spacing">
-               <number>100</number>
+               <number>200</number>
               </property>
              </layout>
             </item>
@@ -206,16 +225,7 @@
           </widget>
          </widget>
         </item>
-        <item row="0" column="0">
-         <widget class="QComboBox" name="categories">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
        </layout>
-       <zorder>categories</zorder>
-       <zorder>scrollArea</zorder>
       </widget>
      </widget>
     </item>
@@ -226,7 +236,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>909</width>
+     <width>795</width>
      <height>21</height>
     </rect>
    </property>
