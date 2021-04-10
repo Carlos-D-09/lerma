@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //Detecta cuando haya una señal, sus argumentos son: quien emite la señal, cual es la señal, quien responde, con que le responde
     connect(openFileAction, SIGNAL(triggered()),this, SLOT(openFile()));
     ui->menuBar->addMenu("&File")->addAction(openFileAction);
+    ui->categories->setEnabled(false);
 
     /*
      * Que se genere el archivo .json
@@ -99,6 +100,8 @@ void MainWindow::validateUser()
         {
             message.setText("Welcome to LERMA " + user);
             ui->viewSW->setCurrentIndex(1);
+            ui->categories->setEnabled(true);
+            showAllDepartments();
             /*Lo que hace es cambiar la pantalla de la aplicación, por defecto la primera
             empieza en 0, que en este caso es la pantalla de inicio de sesión
             */
@@ -193,7 +196,8 @@ void MainWindow::saveDB()
 {
     QJsonObject jsonObj;
     QJsonDocument jsonDoc;
-    jsonObj["users"] = dbArray;
+    jsonObj["users"] = dbuArray;
+    jsonObj["products"] = dbpArray;
     jsonDoc = QJsonDocument(jsonObj);
 
     dbFile.open(QIODevice::WriteOnly);
@@ -212,16 +216,29 @@ void MainWindow::loadDB()
     dbFile.close(); //cierro el archivo
     jsonDoc = QJsonDocument::fromJson(data); //transformo de binario a json
     jsonObj = jsonDoc.object(); //transofrmo del docuemento a un arreglo de .json
-    dbArray = jsonObj["users"].toArray(); //hago que jsonObj en su registro users contenga el arreglo de usuarios y se lo asigna a un arreglo .json
+    dbuArray = jsonObj["users"].toArray(); //hago que jsonObj en su registro users contenga el arreglo de usuarios y se lo asigna a un arreglo .json
 
-    for (int i(0); i < dbArray.size(); i++)
+    for (int i(0); i < dbuArray.size(); i++)
     {
         User u; //creo un objeto u de la clase User
-        QJsonObject obj = dbArray[i].toObject(); //Extraigo del arreglo .json posición i, la transformo en un objeto json y la asigno a obj
+        QJsonObject obj = dbuArray[i].toObject(); //Extraigo del arreglo .json posición i, la transformo en un objeto json y la asigno a obj
         u.setUsername(obj["name"].toString()); //De un QJsonObj conviero a un string de c++
         u.setEmail(obj["email"].toString());
         u.setPassword(obj["password"].toString());
         users.push_back(u);
+    }
+
+    dbpArray = jsonObj["products"].toArray();
+
+    for(int i(0);i < dbpArray.size();i++)
+    {
+        productWidget* p;
+        QJsonObject obj = dbpArray[i].toObject();
+        p = new productWidget (this);
+        p->setId(obj["id"].toString());
+        p->setName(obj["name"].toString());
+        p->setPrice(obj["price"].toDouble());
+        products.push_back(p);
     }
 }
 
@@ -262,7 +279,7 @@ void MainWindow::validateData()
             jsonObj["name"] = u.getUsername();
             jsonObj["email"] = u.getEmail();
             jsonObj["password"] = u.getPassword();
-            dbArray.append(jsonObj);
+            dbuArray.append(jsonObj);
         }
         else
         {
@@ -369,5 +386,103 @@ void MainWindow::openFile()
         ui->loginGB->setEnabled(true);
         ui->signUpGB->setEnabled(true);
         loadDB();
+    }
+}
+
+void MainWindow::setProducts()
+{
+    for(int i(0);i < dbpArray.size();i++)
+    {
+        productWidget* p;
+        QJsonObject obj = dbpArray[i].toObject();
+        p = new productWidget (this);
+        p->setId(obj["id"].toString());
+        p->setName(obj["name"].toString());
+        p->setPrice(obj["price"].toDouble());
+        products[i] = p;
+    }
+}
+
+void MainWindow::clearGrid()
+{
+    QLayoutItem *item;
+    while((item = ui->gridProducts->layout()->takeAt(0)) != nullptr)
+    {
+        delete item->widget();
+        delete item;
+    }
+    setProducts();
+}
+
+void MainWindow::showAllDepartments(int f)
+{
+    int x, y;
+    if(f == 0)
+    {
+        x = 0;
+        y = 0;
+        for(size_t i(0); i < products.size(); i++)
+        {
+            ui->gridProducts->addWidget(products[i], x, y);
+            y++;
+            if( y == 4)
+            {
+                y = 0;
+                x++;
+            }
+        }
+    }
+    else
+    {
+        x = 0;
+        y = 0;
+        clearGrid();
+        for(size_t i(0); i < products.size(); i++)
+        {
+            ui->gridProducts->addWidget(products[i], x, y);
+            y++;
+            if( y == 4)
+            {
+                y = 0;
+                x++;
+            }
+        }
+    }
+}
+
+void MainWindow::showBooks()
+{
+    clearGrid();
+    int x = 0, y = 0;
+    for(size_t i(0); i < products.size(); i++)
+    {
+        productWidget *p;
+        p = products[i];
+        QString id = p->getId();
+        if (strncmp(id.toStdString().c_str(),"L",1) == 0)
+        {
+            ui->gridProducts->addWidget(products[i], x, y);
+            y++;
+            if( y == 4)
+            {
+                y = 0;
+                x++;
+            }
+        }
+    }
+}
+
+void MainWindow::on_categories_currentIndexChanged(int index)
+{
+    switch(index)
+    {
+        case 0:
+                showAllDepartments(1);
+            break;
+        case 1:
+                showBooks();
+            break;
+        default:
+            break;
     }
 }

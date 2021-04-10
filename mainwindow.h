@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <vector>
 #include "user.h"
+#include "productwidget.h"
 #include <QAction>
 #include <QFile>
 #include <QFileDialog>
@@ -43,13 +44,17 @@ private slots:
 
     void openFile();
 
+    void on_categories_currentIndexChanged(int index);
+
 private:
     Ui::MainWindow *ui;
 
     vector<User> users;
+    vector<productWidget*> products;
     QAction* openFileAction;
     QFile dbFile;
-    QJsonArray dbArray;
+    QJsonArray dbuArray;
+    QJsonArray dbpArray;
 
     void enableLoginPB();
     void enableSingUpPB();
@@ -58,6 +63,10 @@ private:
     bool checkEmail(const QString &value);
     void saveDB();
     void loadDB();
+    void showAllDepartments(int f = 0);
+    void showBooks();
+    void clearGrid();
+    void setProducts();
 };
 
 #endif // MAINWINDOW_H
