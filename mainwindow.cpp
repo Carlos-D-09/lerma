@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //Detecta cuando haya una señal, sus argumentos son: quien emite la señal, cual es la señal, quien responde, con que le responde
     connect(openFileAction, SIGNAL(triggered()),this, SLOT(openFile()));
     ui->menuBar->addMenu("&File")->addAction(openFileAction);
-
+    hideSort = false;
     /*
      * Que se genere el archivo .json
         dbFile.setFileName("lerma.json");
@@ -104,6 +104,9 @@ void MainWindow::validateUser()
             QMainWindow::showMaximized();
             ui->categories->setEnabled(true);
             ui->categories->setCurrentIndex(0);
+            ui->filters->setEnabled(true);
+            ui->filters->setCurrentIndex(0);
+            ui->search->setEnabled(true);
             /*Lo que hace es cambiar la pantalla de la aplicación, por defecto la primera
             empieza en 0, que en este caso es la pantalla de inicio de sesión
             */
@@ -569,26 +572,61 @@ void MainWindow::showSportOutdoors()
     }
 }
 
+void MainWindow::evaluateHideSort(const int pos)
+{
+    if(pos == 0)
+    {
+        if(hideSort == true)
+        {
+            ui->filters->setItemData(0,QVariant(),Qt::SizeHintRole);
+            hideSort = false;
+            ui->filters->setCurrentIndex(0);
+        }
+    }
+    else if(pos == 1)
+    {
+        if(hideSort == false)
+        {
+            ui->filters->setItemData(0,QSize(0,0),Qt::SizeHintRole);
+            hideSort = true;
+        }
+    }
+    else
+    {
+        QMessageBox advice;
+        advice.setIcon(QMessageBox::Warning);
+        advice.setText("Something went wrong, please contact technical support");
+        advice.exec();
+    }
+}
+
 void MainWindow::on_categories_currentIndexChanged(int index)
 {
     switch (index)
     {
         case 0:
-            showAllDepartments(1);
+            evaluateHideSort(0);
+            showAllDepartments(cont);
+            cont = 1;
             break;
         case 1:
+            evaluateHideSort(0);
             showFoodDrinks();
             break;
         case 2:
+            evaluateHideSort(0);
             showBooks();
             break;
         case 3:
+            evaluateHideSort(0);
             showElectronics();
             break;
         case 4:
+            evaluateHideSort(0);
             showHomeKitchen();
             break;
         case 5:
+            evaluateHideSort(0);
             showSportOutdoors();
             break;
         default:
@@ -596,6 +634,21 @@ void MainWindow::on_categories_currentIndexChanged(int index)
             advice.setIcon(QMessageBox::Warning);
             advice.setText("Something went wrong, please contact technical support");
             advice.exec();
+            break;
+    }
+}
+
+void MainWindow::on_filters_currentIndexChanged(int index)
+{
+    switch (index)
+    {
+        case 0:
+            break;
+        case 1:
+            evaluateHideSort(1);
+            break;
+        case 2:
+            evaluateHideSort(1);
             break;
     }
 }

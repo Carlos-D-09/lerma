@@ -60,6 +60,8 @@ private slots:
 
     void on_categories_currentIndexChanged(int index);
 
+    void on_filters_currentIndexChanged(int index);
+
 private:
     Ui::MainWindow *ui;
 
@@ -71,6 +73,8 @@ private:
     QJsonArray dbuArray;
     QJsonArray dbpArray;
     productWidget *productInfo;
+    int cont;
+    bool hideSort;
 
     void enableLoginPB();
     void enableSingUpPB();
@@ -87,6 +91,7 @@ private:
     void showElectronics();
     void showHomeKitchen();
     void showSportOutdoors();
+    void evaluateHideSort(const int pos);
 };
 
 #endif // MAINWINDOW_H

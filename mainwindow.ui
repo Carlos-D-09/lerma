@@ -160,7 +160,7 @@
       <widget class="QWidget" name="page_2">
        <layout class="QGridLayout" name="gridLayout_5">
         <item row="1" column="0" rowspan="2" colspan="2">
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <layout class="QHBoxLayout" name="setQCombosBoxes">
           <property name="spacing">
            <number>9</number>
           </property>
@@ -227,6 +227,12 @@
             <property name="editable">
              <bool>false</bool>
             </property>
+            <property name="currentText">
+             <string>Ascendent</string>
+            </property>
+            <property name="currentIndex">
+             <number>1</number>
+            </property>
             <item>
              <property name="text">
               <string>Sort...</string>
@@ -245,7 +251,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEdit">
+           <widget class="QLineEdit" name="search">
             <property name="enabled">
              <bool>false</bool>
             </property>
