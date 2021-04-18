@@ -67,13 +67,11 @@ private:
 
     vector<User> users;
     vector<productWidget*> products;
-    vector<productWidget*> products_aux;
     QAction* openFileAction;
     QFile dbFile;
     QJsonArray dbuArray;
     QJsonArray dbpArray;
-    productWidget *productInfo;
-    int cont;
+    int cont = 0;
     bool hideSort;
 
     void enableLoginPB();
@@ -85,13 +83,22 @@ private:
     void loadDB();
     void setProducts();
     void clearGrid();
-    void showAllDepartments(int cont = 0);
+    void showAllDepartments();
     void showFoodDrinks();
     void showBooks();
     void showElectronics();
     void showHomeKitchen();
     void showSportOutdoors();
     void evaluateHideSort(const int pos);
+
+    void putErrorMessage();
+
+    void sortByPrice(const int type, const int categorie);
+
+    void changeObjects(const int i, const int j);
+    void sortAllDepartments(const int type);
+    void sortProducts(const int type);
+
 };
 
 #endif // MAINWINDOW_H

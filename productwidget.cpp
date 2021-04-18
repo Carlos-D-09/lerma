@@ -2,12 +2,12 @@
 #include <QString>
 #include "ui_productwidget.h"
 
-productWidget::productWidget(QWidget *parent, QString id, QString name, float price) :
+productWidget::productWidget(QWidget *parent,const QString id, QString name, float price) :
     QWidget(parent),
     ui(new Ui::productWidget)
 {
     ui->setupUi(this);
-    QPixmap pix(":/Productos/imgs/"+ id);
+    QPixmap pix;(":/Productos/imgs/"+ id);
     ui->productImage->setPixmap(pix);
     ui->productDescription->setText(name);
     ui->productPrice->setText("$" + QString::number(price));
@@ -25,7 +25,9 @@ QString productWidget::getId() const
 void productWidget::setId(const QString &value)
 {
     id = value;
-    QPixmap pix(":/Productos/imgs/" + id);
+    QImage image;
+    image.load(":/Carpeta/Productos/imgs/" + id);
+    QPixmap pix = QPixmap::fromImage(image.scaled(250, 300));
     ui->productImage->setPixmap(pix);
 }
 QString productWidget::getName() const

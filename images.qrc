@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/">
+    <qresource prefix="/Carpeta">
         <file>Productos/imgs/AB01.jpg</file>
         <file>Productos/imgs/AB02.jpg</file>
         <file>Productos/imgs/AB03.jpg</file>

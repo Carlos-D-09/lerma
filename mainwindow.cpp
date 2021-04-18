@@ -331,9 +331,7 @@ void MainWindow::validateData()
     }
 }
 
-
 //viewSW (verStackedWidget)Son todos de slots
-
 void MainWindow::on_usernameLE_textChanged(const QString &arg1)
 {
     /*cada vez que haya un cambio de texto en la casilla de usernameLE
@@ -417,45 +415,26 @@ void MainWindow::clearGrid()
         delete item->widget();
         delete item;
     }
+    setProducts();
 }
 
-void MainWindow::showAllDepartments(int cont)
+void MainWindow::showAllDepartments()
 {
     int x = 0, y = 0;
-    if(cont == 0)
+    for(size_t i = 0; i < products.size(); i++)
     {
-        for(size_t i = 0; i < products.size(); i++)
+        ui->gridProducts->addWidget(products[i], x, y);
+        y++;
+        if(y == 4)
         {
-            ui->gridProducts->addWidget(products[i], x, y);
-            y++;
-            if(y == 4)
-            {
-                y = 0;
-                x++;
-            }
-        }
-    }
-    else
-    {
-        clearGrid();
-        setProducts();
-        for(size_t i = 0; i < products.size(); i++)
-        {
-            ui->gridProducts->addWidget(products[i], x, y);
-            y++;
-            if(y == 4)
-            {
-                y = 0;
-                x++;
-            }
+            y = 0;
+            x++;
         }
     }
 }
 
 void MainWindow::showFoodDrinks()
 {
-    clearGrid();
-    setProducts();
     int x = 0, y = 0;
     for(size_t i = 0; i < products.size(); i++)
     {
@@ -478,8 +457,6 @@ void MainWindow::showFoodDrinks()
 
 void MainWindow::showBooks()
 {
-    clearGrid();
-    setProducts();
     int x = 0, y = 0;
     for(size_t i = 0; i < products.size(); i++)
     {
@@ -502,8 +479,6 @@ void MainWindow::showBooks()
 
 void MainWindow::showElectronics()
 {
-    clearGrid();
-    setProducts();
     int x = 0, y = 0;
     for(size_t i = 0; i < products.size(); i++)
     {
@@ -526,8 +501,6 @@ void MainWindow::showElectronics()
 
 void MainWindow::showHomeKitchen()
 {
-    clearGrid();
-    setProducts();
     int x = 0, y = 0;
     for(size_t i = 0; i < products.size(); i++)
     {
@@ -550,8 +523,6 @@ void MainWindow::showHomeKitchen()
 
 void MainWindow::showSportOutdoors()
 {
-    clearGrid();
-    setProducts();
     int x = 0, y = 0;
     for(size_t i = 0; i < products.size(); i++)
     {
@@ -570,6 +541,14 @@ void MainWindow::showSportOutdoors()
             }
         }
     }
+}
+
+void MainWindow::putErrorMessage()
+{
+    QMessageBox advice;
+    advice.setIcon(QMessageBox::Warning);
+    advice.setText("Something went wrong, please contact technical support");
+    advice.exec();
 }
 
 void MainWindow::evaluateHideSort(const int pos)
@@ -593,10 +572,97 @@ void MainWindow::evaluateHideSort(const int pos)
     }
     else
     {
-        QMessageBox advice;
-        advice.setIcon(QMessageBox::Warning);
-        advice.setText("Something went wrong, please contact technical support");
-        advice.exec();
+        putErrorMessage();
+    }
+}
+
+void MainWindow::changeObjects(const int i, const int j)
+{
+    productWidget *temp;
+    temp = new productWidget(this);
+    temp = products[i];
+    products[i] = products[j];
+    products[j] = temp;
+}
+
+void MainWindow::sortProducts(const int type)
+{
+    clearGrid();
+    productWidget* obj, *obj2;
+    //Mayor a menor
+    if(type == 1)
+    {
+        size_t min;
+        for(size_t i = 0; i < products.size()-1; i++)
+        {
+            min = i;
+            for(size_t j = i+1; j < products.size(); j++)
+            {
+                obj = new productWidget(this);
+                obj = products[j];
+                obj2 = new productWidget(this);
+                obj2 = products[min];
+                if(obj->getPrice() < obj2->getPrice())
+                {
+                    min = j;
+                }
+            }
+            changeObjects(i,min);
+        }
+    }
+    //Menor a mayor
+    else if(type == 2)
+    {
+        size_t max;
+        for(size_t i = 0; i < products.size()-1; i++)
+        {
+            max = i;
+            for(size_t j = i+1; j < products.size(); j++)
+            {
+                obj = new productWidget(this);
+                obj = products[j];
+                obj2 = new productWidget(this);
+                obj2 = products[max];
+                if(obj->getPrice() > obj2->getPrice())
+                {
+                    max = j;
+                }
+            }
+            changeObjects(i,max);
+        }
+    }
+    else
+    {
+        putErrorMessage();
+    }
+}
+
+void MainWindow::sortByPrice(const int type,const int categorie)
+{
+    sortProducts(type);
+    switch(categorie)
+    {
+        case 0:
+            showAllDepartments();
+            break;
+        case 1:
+            showFoodDrinks();
+            break;
+        case 2:
+            showBooks();
+            break;
+        case 3:
+            showElectronics();
+            break;
+        case 4:
+            showHomeKitchen();
+            break;
+        case 5:
+            showSportOutdoors();
+            break;
+        default:
+            putErrorMessage();
+            break;
     }
 }
 
@@ -605,35 +671,45 @@ void MainWindow::on_categories_currentIndexChanged(int index)
     switch (index)
     {
         case 0:
-            evaluateHideSort(0);
-            showAllDepartments(cont);
-            cont = 1;
+            if(cont == 0)
+            {
+                showAllDepartments();
+                cont = 1;
+            }
+            else
+            {
+                clearGrid();
+                evaluateHideSort(0);
+                showAllDepartments();
+            }
             break;
         case 1:
+            clearGrid();
             evaluateHideSort(0);
             showFoodDrinks();
             break;
         case 2:
+            clearGrid();
             evaluateHideSort(0);
             showBooks();
             break;
         case 3:
+            clearGrid();
             evaluateHideSort(0);
             showElectronics();
             break;
         case 4:
+            clearGrid();
             evaluateHideSort(0);
             showHomeKitchen();
             break;
         case 5:
+            clearGrid();
             evaluateHideSort(0);
             showSportOutdoors();
             break;
         default:
-            QMessageBox advice;
-            advice.setIcon(QMessageBox::Warning);
-            advice.setText("Something went wrong, please contact technical support");
-            advice.exec();
+            putErrorMessage();
             break;
     }
 }
@@ -646,9 +722,14 @@ void MainWindow::on_filters_currentIndexChanged(int index)
             break;
         case 1:
             evaluateHideSort(1);
+            sortByPrice(index,ui->categories->currentIndex());
             break;
         case 2:
             evaluateHideSort(1);
+            sortByPrice(index,ui->categories->currentIndex());
+            break;
+        default:
+            putErrorMessage();
             break;
     }
 }
