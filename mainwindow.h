@@ -62,6 +62,8 @@ private slots:
 
     void on_filters_currentIndexChanged(int index);
 
+    void on_search_returnPressed();
+
 private:
     Ui::MainWindow *ui;
 
@@ -83,21 +85,32 @@ private:
     void loadDB();
     void setProducts();
     void clearGrid();
+
     void showAllDepartments();
+    void showSearchAllDepartments(const QString input);
+
     void showFoodDrinks();
+    void showSearchFoodDrinks(const QString input);
+
     void showBooks();
+    void showSearchBooks(const QString input);
+
     void showElectronics();
+    void showSearchElectronics(const QString input);
+
     void showHomeKitchen();
+    void showSearchHomeKitchen(const QString input);
+
     void showSportOutdoors();
+    void showSearchSportOutdoors(const QString input);
+
     void evaluateHideSort(const int pos);
-
     void putErrorMessage();
-
-    void sortByPrice(const int type, const int categorie);
-
+    void showByPrice(const int type, const int categorie);
     void changeObjects(const int i, const int j);
-    void sortAllDepartments(const int type);
     void sortProducts(const int type);
+    string convertToLowerCase(string cad);
+    void invalidSearch();
 
 };
 

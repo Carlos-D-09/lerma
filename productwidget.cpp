@@ -2,15 +2,11 @@
 #include <QString>
 #include "ui_productwidget.h"
 
-productWidget::productWidget(QWidget *parent,const QString id, QString name, float price) :
+productWidget::productWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::productWidget)
 {
     ui->setupUi(this);
-    QPixmap pix;(":/Productos/imgs/"+ id);
-    ui->productImage->setPixmap(pix);
-    ui->productDescription->setText(name);
-    ui->productPrice->setText("$" + QString::number(price));
 }
 
 productWidget::~productWidget()

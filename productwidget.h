@@ -12,7 +12,7 @@ class productWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit productWidget(QWidget *parent = 0,const QString id = "", QString name = "", float price = 0);
+    explicit productWidget(QWidget *parent = 0);
     ~productWidget();
 
     QString getId() const;

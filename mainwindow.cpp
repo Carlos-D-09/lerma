@@ -418,6 +418,22 @@ void MainWindow::clearGrid()
     setProducts();
 }
 
+string MainWindow::convertToLowerCase(string cad)
+{
+    for(size_t i = 0; i < cad.size(); i++)
+    {
+        cad[i] = toupper(cad[i]);
+    }
+    return cad;
+}
+
+void MainWindow::invalidSearch()
+{
+    QMessageBox advice;
+    advice.setText("No se encontro ningún producto con el patron deseado");
+    advice.exec();
+}
+
 void MainWindow::showAllDepartments()
 {
     int x = 0, y = 0;
@@ -430,6 +446,30 @@ void MainWindow::showAllDepartments()
             y = 0;
             x++;
         }
+    }
+}
+
+void MainWindow::showSearchAllDepartments(const QString input)
+{
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget *obj;
+        obj = products[i];
+        if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
+        {
+            ui->gridProducts->addWidget(products[i], x, y);
+            y++;
+            if(y == 4)
+            {
+                y = 0;
+                x++;
+            }
+        }
+    }
+    if(x == 0 && y == 0)
+    {
+        invalidSearch();
     }
 }
 
@@ -455,6 +495,35 @@ void MainWindow::showFoodDrinks()
     }
 }
 
+void MainWindow::showSearchFoodDrinks(const QString input)
+{
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "AB", 2) == 0)
+        {
+            if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
+            {
+                ui->gridProducts->addWidget(products[i], x, y);
+                y++;
+                if(y == 4)
+                {
+                    y = 0;
+                    x++;
+                }
+            }
+        }
+    }
+    if(x == 0 && y == 0)
+    {
+        invalidSearch();
+    }
+}
+
 void MainWindow::showBooks()
 {
     int x = 0, y = 0;
@@ -474,6 +543,35 @@ void MainWindow::showBooks()
                 x++;
             }
         }
+    }
+}
+
+void MainWindow::showSearchBooks(const QString input)
+{
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "L", 1) == 0)
+        {
+            if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
+            {
+                ui->gridProducts->addWidget(products[i], x, y);
+                y++;
+                if(y == 4)
+                {
+                    y = 0;
+                    x++;
+                }
+            }
+        }
+    }
+    if( x == 0 && y == 0)
+    {
+        invalidSearch();
     }
 }
 
@@ -499,6 +597,35 @@ void MainWindow::showElectronics()
     }
 }
 
+void MainWindow::showSearchElectronics(const QString input)
+{
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "E", 1) == 0)
+        {
+            if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
+            {
+                ui->gridProducts->addWidget(products[i], x, y);
+                y++;
+                if(y == 4)
+                {
+                    y = 0;
+                    x++;
+                }
+            }
+        }
+    }
+    if(x == 0 && y == 0)
+    {
+        invalidSearch();
+    }
+}
+
 void MainWindow::showHomeKitchen()
 {
     int x = 0, y = 0;
@@ -521,6 +648,35 @@ void MainWindow::showHomeKitchen()
     }
 }
 
+void MainWindow::showSearchHomeKitchen(const QString input)
+{
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "HC", 2) == 0)
+        {
+            if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
+            {
+                ui->gridProducts->addWidget(products[i], x, y);
+                y++;
+                if(y == 4)
+                {
+                    y = 0;
+                    x++;
+                }
+            }
+        }
+    }
+    if(x == 0 && y == 0)
+    {
+        invalidSearch();
+    }
+}
+
 void MainWindow::showSportOutdoors()
 {
     int x = 0, y = 0;
@@ -540,6 +696,35 @@ void MainWindow::showSportOutdoors()
                 x++;
             }
         }
+    }
+}
+
+void MainWindow::showSearchSportOutdoors(const QString input)
+{
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "D", 1) == 0)
+        {
+            if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
+            {
+                ui->gridProducts->addWidget(products[i], x, y);
+                y++;
+                if(y == 4)
+                {
+                    y = 0;
+                    x++;
+                }
+            }
+        }
+    }
+    if(x == 0 && y == 0)
+    {
+        invalidSearch();
     }
 }
 
@@ -585,6 +770,7 @@ void MainWindow::changeObjects(const int i, const int j)
     products[j] = temp;
 }
 
+//Acomoda los productos de mayor a menor
 void MainWindow::sortProducts(const int type)
 {
     clearGrid();
@@ -637,32 +823,43 @@ void MainWindow::sortProducts(const int type)
     }
 }
 
-void MainWindow::sortByPrice(const int type,const int categorie)
+void MainWindow::showByPrice(const int type,const int categorie)
 {
-    sortProducts(type);
-    switch(categorie)
+    QString word = ui->search->text();
+    //Se evalua si el usuario introducio previamente una cadena que desea buscar
+    if(word.length() > 0)
     {
-        case 0:
-            showAllDepartments();
-            break;
-        case 1:
-            showFoodDrinks();
-            break;
-        case 2:
-            showBooks();
-            break;
-        case 3:
-            showElectronics();
-            break;
-        case 4:
-            showHomeKitchen();
-            break;
-        case 5:
-            showSportOutdoors();
-            break;
-        default:
-            putErrorMessage();
-            break;
+        //Si la hay, manda a llamar la señal
+        on_search_returnPressed();
+    }
+    else
+    {
+        //En caso de que no haya, simplemente ordena los productos
+        sortProducts(type);
+        switch(categorie)
+        {
+            case 0:
+                showAllDepartments();
+                break;
+            case 1:
+                showFoodDrinks();
+                break;
+            case 2:
+                showBooks();
+                break;
+            case 3:
+                showElectronics();
+                break;
+            case 4:
+                showHomeKitchen();
+                break;
+            case 5:
+                showSportOutdoors();
+                break;
+            default:
+                putErrorMessage();
+                break;
+        }
     }
 }
 
@@ -671,6 +868,7 @@ void MainWindow::on_categories_currentIndexChanged(int index)
     switch (index)
     {
         case 0:
+            ui->search->clear();
             if(cont == 0)
             {
                 showAllDepartments();
@@ -684,26 +882,31 @@ void MainWindow::on_categories_currentIndexChanged(int index)
             }
             break;
         case 1:
+            ui->search->clear();
             clearGrid();
             evaluateHideSort(0);
             showFoodDrinks();
             break;
         case 2:
+            ui->search->clear();
             clearGrid();
             evaluateHideSort(0);
             showBooks();
             break;
         case 3:
+            ui->search->clear();
             clearGrid();
             evaluateHideSort(0);
             showElectronics();
             break;
         case 4:
+            ui->search->clear();
             clearGrid();
             evaluateHideSort(0);
             showHomeKitchen();
             break;
         case 5:
+            ui->search->clear();
             clearGrid();
             evaluateHideSort(0);
             showSportOutdoors();
@@ -722,11 +925,46 @@ void MainWindow::on_filters_currentIndexChanged(int index)
             break;
         case 1:
             evaluateHideSort(1);
-            sortByPrice(index,ui->categories->currentIndex());
+            showByPrice(index,ui->categories->currentIndex());
             break;
         case 2:
             evaluateHideSort(1);
-            sortByPrice(index,ui->categories->currentIndex());
+            showByPrice(index,ui->categories->currentIndex());
+            break;
+        default:
+            putErrorMessage();
+            break;
+    }
+}
+
+void MainWindow::on_search_returnPressed()
+{
+    clearGrid();
+    int filtersIndex = ui->filters->currentIndex();
+    int categorieIndex = ui->categories->currentIndex();
+    if(filtersIndex > 0)
+    {
+        sortProducts(filtersIndex);
+    }
+    switch(categorieIndex)
+    {
+        case 0:
+            showSearchAllDepartments(ui->search->text());
+            break;
+        case 1:
+            showSearchFoodDrinks(ui->search->text());
+            break;
+        case 2:
+            showSearchBooks(ui->search->text());
+            break;
+        case 3:
+            showSearchElectronics(ui->search->text());
+            break;
+        case 4:
+            showSearchHomeKitchen(ui->search->text());
+            break;
+        case 5:
+            showSearchSportOutdoors(ui->search->text());
             break;
         default:
             putErrorMessage();
