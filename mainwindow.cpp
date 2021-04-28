@@ -432,6 +432,15 @@ void MainWindow::invalidSearch()
     QMessageBox advice;
     advice.setText("No se encontro ningún producto con el patron deseado");
     advice.exec();
+    ui->search->clear();
+    if(ui->filters->currentIndex() > 0)
+    {
+        on_filters_currentIndexChanged(ui->filters->currentIndex());
+    }
+    else
+    {
+        on_categories_currentIndexChanged(ui->categories->currentIndex());
+    }
 }
 
 void MainWindow::showAllDepartments()
