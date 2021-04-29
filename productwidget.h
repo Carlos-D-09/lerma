@@ -24,6 +24,15 @@ public:
     float getPrice() const;
     void setPrice(const double &value);
 
+private slots:
+
+    void on_addButton_clicked();
+
+    void on_amountSpinBox_valueChanged(int arg1);
+
+signals:
+    void addItem(QString id, int amount);
+
 private:
     Ui::productWidget *ui;
     QString id;

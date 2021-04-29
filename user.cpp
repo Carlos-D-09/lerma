@@ -31,6 +31,14 @@ void User::setPassword(const QString &value)
     password = value;
 }
 
+void User::setChart(QJsonObject &obj)
+{
+    if(obj.contains("purchase") == true)
+    {
+        this->shoppingHistory = obj["purchase"].toArray();
+    }
+}
+
 User::User()
 {
 

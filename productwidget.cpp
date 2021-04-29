@@ -26,6 +26,7 @@ void productWidget::setId(const QString &value)
     QPixmap pix = QPixmap::fromImage(image.scaled(250, 300));
     ui->productImage->setPixmap(pix);
 }
+
 QString productWidget::getName() const
 {
     return name;
@@ -35,6 +36,7 @@ void productWidget::setName(const QString &value)
     name = value;
     ui->productDescription->setText(name);
 }
+
 float productWidget::getPrice() const
 {
     return price;
@@ -43,4 +45,22 @@ void productWidget::setPrice(const double &value)
 {
     price = float(value);
     ui->productPrice->setText("$" + QString::number(price));
+}
+
+void productWidget::on_addButton_clicked()
+{
+    emit addItem(id, ui->amountSpinBox->value());
+    ui->amountSpinBox->setValue(0);
+}
+
+void productWidget::on_amountSpinBox_valueChanged(int arg1)
+{
+    if(arg1 > 0)
+    {
+        ui->addButton->setEnabled(true);
+    }
+    else
+    {
+        ui->addButton->setEnabled(false);
+    }
 }

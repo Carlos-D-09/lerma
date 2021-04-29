@@ -2,6 +2,8 @@
 #define USERS_H
 
 #include <QString>
+#include <QJsonArray>
+#include <QJsonObject>
 
 using namespace std;
 
@@ -11,6 +13,7 @@ private:
     QString username;
     QString email;
     QString password;
+    QJsonArray shoppingHistory;
 
 public:
     User();
@@ -23,6 +26,8 @@ public:
 
     QString getPassword() const;
     void setPassword(const QString &value);
+
+    void setChart (QJsonObject &shoppingHisoty);
 };
 
 #endif // USERS_H

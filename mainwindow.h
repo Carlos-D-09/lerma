@@ -24,6 +24,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include <string>
+#include <QDateTime>
 
 using namespace std;
 
@@ -64,6 +65,8 @@ private slots:
 
     void on_search_returnPressed();
 
+    void addToChart(QString item, int amount);
+
 private:
     Ui::MainWindow *ui;
 
@@ -73,7 +76,8 @@ private:
     QFile dbFile;
     QJsonArray dbuArray;
     QJsonArray dbpArray;
-    int cont = 0;
+    QJsonArray chart;
+    int printingProductsFlag = 0;
     bool hideSort;
 
     void enableLoginPB();

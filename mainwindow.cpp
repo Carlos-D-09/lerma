@@ -198,6 +198,11 @@ bool MainWindow::checkEmail(const QString &value)
 
 void MainWindow::saveDB()
 {
+    QDateTime currentTime = QDateTime::currentDateTime();
+    QString currentTimeString = currentTime.toString("dd/MM/yyyy"); + " " + currentTime.toString("hh:mm:ss");
+    QJsonObject shopping;
+    shopping[currentTimeString] = chart;
+
     QJsonObject jsonObj;
     QJsonDocument jsonDoc;
     jsonObj["users"] = dbuArray;
@@ -230,6 +235,7 @@ void MainWindow::loadDB()
         u.setUsername(obj["name"].toString()); //De un QJsonObj conviero a un string de c++
         u.setEmail(obj["email"].toString());
         u.setPassword(obj["password"].toString());
+        u.setChart(obj);
         users.push_back(u);
     }
 
@@ -243,11 +249,12 @@ void MainWindow::loadDB()
         p->setId(obj["id"].toString());
         p->setName(obj["name"].toString());
         p->setPrice(obj["price"].toDouble());
+        connect(p,SIGNAL(addItem(QString,int)),this,SLOT(addToChart(QString,int)));
         products.push_back(p);
     }
 }
 
-//Metodo para identificar repeticiones de datos al momento de crear un nuevo usuaio
+//Metodo para identificar repeticiones de datos al momento de crear un nuevo usuario
 void MainWindow::validateData()
 {
     QMessageBox message;
@@ -403,6 +410,7 @@ void MainWindow::setProducts()
         p->setId(obj["id"].toString());
         p->setName(obj["name"].toString());
         p->setPrice(obj["price"].toDouble());
+        connect(p,SIGNAL(addItem(QString,int)),this,SLOT(addToChart(QString,int)));
         products[i] = p;
     }
 }
@@ -443,6 +451,7 @@ void MainWindow::invalidSearch()
     }
 }
 
+//Mostrar los productos en pantalla
 void MainWindow::showAllDepartments()
 {
     int x = 0, y = 0;
@@ -736,6 +745,7 @@ void MainWindow::showSearchSportOutdoors(const QString input)
         invalidSearch();
     }
 }
+//Aqui termina mostrar los productos en pantalla
 
 void MainWindow::putErrorMessage()
 {
@@ -878,10 +888,10 @@ void MainWindow::on_categories_currentIndexChanged(int index)
     {
         case 0:
             ui->search->clear();
-            if(cont == 0)
+            if(printingProductsFlag == 0)
             {
                 showAllDepartments();
-                cont = 1;
+                printingProductsFlag = 1;
             }
             else
             {
@@ -979,4 +989,12 @@ void MainWindow::on_search_returnPressed()
             putErrorMessage();
             break;
     }
+}
+
+void MainWindow::addToChart(QString item, int amount)
+{
+    QJsonObject jsonObjectSales;
+    jsonObjectSales["id"] = item;
+    jsonObjectSales["units"] = amount;
+    chart.append(jsonObjectSales);
 }
