@@ -27,7 +27,8 @@ public:
     QString getPassword() const;
     void setPassword(const QString &value);
 
-    void setChart (QJsonObject &shoppingHisoty);
+    void setShoppingHistory (QJsonObject &shoppingHisoty);
+    QJsonArray getShoppingHistory();
 };
 
 #endif // USERS_H

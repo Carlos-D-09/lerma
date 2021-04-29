@@ -97,6 +97,7 @@ void MainWindow::validateUser()
         }
         else
         {
+            currentUser = it;
             message.setText("Welcome to LERMA " + user);
             ui->viewSW->setCurrentIndex(1);
             message.exec();
@@ -199,9 +200,17 @@ bool MainWindow::checkEmail(const QString &value)
 void MainWindow::saveDB()
 {
     QDateTime currentTime = QDateTime::currentDateTime();
-    QString currentTimeString = currentTime.toString("dd/MM/yyyy"); + " " + currentTime.toString("hh:mm:ss");
+    QString currentTimeString = currentTime.toString("dd/MM/yyyy") + " " + currentTime.toString("hh:mm:ss");
     QJsonObject shopping;
     shopping[currentTimeString] = chart;
+    int index = std::distance(users.begin(), currentUser);
+    User u = users[index];
+    QJsonArray purchase = u.getShoppingHistory();
+    purchase.append(shopping);
+
+    QJsonObject user = dbuArray[index].toObject();
+    user["purchase"] = purchase;
+    dbuArray.replace(index,user);
 
     QJsonObject jsonObj;
     QJsonDocument jsonDoc;
@@ -235,7 +244,7 @@ void MainWindow::loadDB()
         u.setUsername(obj["name"].toString()); //De un QJsonObj conviero a un string de c++
         u.setEmail(obj["email"].toString());
         u.setPassword(obj["password"].toString());
-        u.setChart(obj);
+        u.setShoppingHistory(obj);
         users.push_back(u);
     }
 
