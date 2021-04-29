@@ -71,7 +71,7 @@ private:
     Ui::MainWindow *ui;
 
     vector<User> users;
-    vector<User>::iterator currentUser;
+    int currentUser;
     vector<productWidget*> products;
     QAction* openFileAction;
     QFile dbFile;

@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+//Constructor
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -11,8 +12,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Detecta cuando haya una señal, sus argumentos son: quien emite la señal, cual es la señal, quien responde, con que le responde
     connect(openFileAction, SIGNAL(triggered()),this, SLOT(openFile()));
+    //Agrega la opcion file a la interfaz grafica y agrega la accion openFileAction
     ui->menuBar->addMenu("&File")->addAction(openFileAction);
     hideSort = false;
+
     /*
      * Que se genere el archivo .json
         dbFile.setFileName("lerma.json");
@@ -21,13 +24,207 @@ MainWindow::MainWindow(QWidget *parent) :
     */
 }
 
+//Destructor
 MainWindow::~MainWindow()
 {
     saveDB();
     delete ui;
 }
 
-//Habilitar el boton login push Botton
+//Slots
+
+//Iniciar sesion
+void MainWindow::on_usernameLE_textChanged(const QString &arg1)
+{
+    /*cada vez que haya un cambio de texto en la casilla de usernameLE
+    llamo al metodo para ver si se activa o no el boton de login*/
+    Q_UNUSED(arg1);
+    enableLoginPB();
+}
+
+//Inciar sesion
+void MainWindow::on_passwordLE_textChanged(const QString &arg1)
+{
+    Q_UNUSED (arg1);
+    enableLoginPB();
+}
+
+//Registrarse
+void MainWindow::on_newUserLE_textChanged(const QString &arg1)
+{
+    Q_UNUSED (arg1);
+    enableSingUpPB();
+}
+
+//Registrarse
+void MainWindow::on_emailLE_textChanged(const QString &arg1)
+{
+    Q_UNUSED (arg1);
+    enableSingUpPB();
+}
+
+//Registrarse
+void MainWindow::on_newPasswordLE_textChanged(const QString &arg1)
+{
+    Q_UNUSED (arg1);
+    enableSingUpPB();
+}
+
+void MainWindow::on_signUpPB_clicked()
+{
+    validateData();
+}
+
+void MainWindow::on_loginPB_clicked()
+{
+    validateUser();
+}
+
+//Abre un explorador de archivos y permite seleccionar solo los .json, se manda a llamar en el constructor
+void MainWindow::openFile()
+{
+    QString name;
+    //Busca el archivo dentro del sistema de archivos, recibe como argumentos:
+    //el widget, la leyenda que aparecera, donde se empieza la busqueda
+    //("" para que se busque en la carpeta contenedora del ejecutable),cual es el filtro que se aplica
+    name = QFileDialog::getOpenFileName(this,"Select Database","","JSON files (*.json)");
+
+    if (name.length() > 0)
+    {
+        dbFile.setFileName(name);
+        ui->loginGB->setEnabled(true);
+        ui->signUpGB->setEnabled(true);
+        loadDB();
+    }
+}
+
+//Cada que se cambia el index de las categorias, evalua cual es la que tiene que mostrar
+void MainWindow::on_categories_currentIndexChanged(int index)
+{
+    switch (index)
+    {
+        case 0:
+            ui->search->clear();
+            if(printingProductsFlag == 0)
+            {
+                showAllDepartments();
+                printingProductsFlag = 1;
+            }
+            else
+            {
+                clearGrid();
+                evaluateHideSort(0);
+                showAllDepartments();
+            }
+            break;
+        case 1:
+            ui->search->clear();
+            clearGrid();
+            evaluateHideSort(0);
+            showFoodDrinks();
+            break;
+        case 2:
+            ui->search->clear();
+            clearGrid();
+            evaluateHideSort(0);
+            showBooks();
+            break;
+        case 3:
+            ui->search->clear();
+            clearGrid();
+            evaluateHideSort(0);
+            showElectronics();
+            break;
+        case 4:
+            ui->search->clear();
+            clearGrid();
+            evaluateHideSort(0);
+            showHomeKitchen();
+            break;
+        case 5:
+            ui->search->clear();
+            clearGrid();
+            evaluateHideSort(0);
+            showSportOutdoors();
+            break;
+        default:
+            putErrorMessage();
+            break;
+    }
+}
+
+//cada que se cambia el index de los filtros por precio, evalua cual es el filtro que se desea
+void MainWindow::on_filters_currentIndexChanged(int index)
+{
+    switch (index)
+    {
+        case 0:
+            break;
+        case 1:
+            evaluateHideSort(1);
+            showByPrice(index,ui->categories->currentIndex());
+            break;
+        case 2:
+            evaluateHideSort(1);
+            showByPrice(index,ui->categories->currentIndex());
+            break;
+        default:
+            putErrorMessage();
+            break;
+    }
+}
+
+//Cada que se realice enter en el boton de busqueda
+void MainWindow::on_search_returnPressed()
+{
+    clearGrid();
+    int filtersIndex = ui->filters->currentIndex();
+    int categorieIndex = ui->categories->currentIndex();
+    if(filtersIndex > 0)
+    {
+        sortProducts(filtersIndex);
+    }
+    switch(categorieIndex)
+    {
+        case 0:
+            showSearchAllDepartments(ui->search->text());
+            break;
+        case 1:
+            showSearchFoodDrinks(ui->search->text());
+            break;
+        case 2:
+            showSearchBooks(ui->search->text());
+            break;
+        case 3:
+            showSearchElectronics(ui->search->text());
+            break;
+        case 4:
+            showSearchHomeKitchen(ui->search->text());
+            break;
+        case 5:
+            showSearchSportOutdoors(ui->search->text());
+            break;
+        default:
+            putErrorMessage();
+            break;
+    }
+}
+
+//Agrega las compras del dias al carrito
+void MainWindow::addToChart(QString item, int amount)
+{
+    QJsonObject jsonObjectSales;
+    jsonObjectSales["id"] = item;
+    jsonObjectSales["units"] = amount;
+    chart.append(jsonObjectSales);
+}
+
+//Aqui terminan los slots
+
+
+//Implementacion de metodos
+
+//Habilitar el boton login
 void MainWindow::enableLoginPB()
 {
     if(ui->usernameLE->text().length() > 0 &&
@@ -41,7 +238,7 @@ void MainWindow::enableLoginPB()
     }
 }
 
-//Habilitar el boton login push Botton
+//Habilitar el boton sign push
 void MainWindow::enableSingUpPB()
 {
     if(ui->newUserLE->text().length() > 0 &&
@@ -56,7 +253,7 @@ void MainWindow::enableSingUpPB()
     }
 }
 
-//Busca si el usuario que se ingreso ya esta registrado para iniciar sesión
+//Valida el ingreso a la plataforma
 void MainWindow::validateUser()
 {
     QMessageBox message;
@@ -97,7 +294,7 @@ void MainWindow::validateUser()
         }
         else
         {
-            currentUser = it;
+            currentUser = std::distance(users.begin(), it);
             message.setText("Welcome to LERMA " + user);
             ui->viewSW->setCurrentIndex(1);
             message.exec();
@@ -115,7 +312,91 @@ void MainWindow::validateUser()
     }
 }
 
-//Metodo para corroborar la dirección de correo electronico
+//Valida el registro de un nuevo usuario
+void MainWindow::validateData()
+{
+    QMessageBox message;
+    QString user = ui->newUserLE->text();
+    QString email = ui->emailLE->text();
+    //Si el email introducidio es valido
+    if(checkEmail(email) == true)
+    {
+        //Busca que no haya un nombre de usuario o email en el vector users
+        vector <User> :: iterator it; //iterador para la función find if
+        it = find_if(users.begin(),users.end(),[&user, &email](User u) -> bool
+        {
+            return (u.getUsername() == user || u.getEmail() == email);
+        }
+            );
+
+        //Si no lo hay, registra el usuario sin problema
+        if(it == users.end())
+        {
+            QJsonObject jsonObj;
+            User u;
+            u.setUsername(ui->newUserLE->text());
+            u.setEmail(ui->emailLE->text());
+            u.setPassword(ui->newPasswordLE->text());
+
+            users.push_back(u);
+            message.setText("New user created");
+            message.exec();
+            ui->newUserLE->clear();
+            ui->newPasswordLE->clear();
+            ui->emailLE->clear();
+
+            //Se agrega al final del arreglo json el usuario registrado
+            jsonObj["name"] = u.getUsername();
+            jsonObj["email"] = u.getEmail();
+            jsonObj["password"] = u.getPassword();
+            dbuArray.append(jsonObj);
+        }
+        else
+        {
+            User u = *it;
+
+            //En caso que se este tratando de registrar un usuario ya creado
+            if(u.getUsername() == user && u.getEmail() == email)
+            {
+                message.setText("This user is already registred");
+                message.setIcon(QMessageBox::Warning);
+                message.exec();
+                ui->newUserLE->clear();
+                ui->newPasswordLE->clear();
+                ui->emailLE->clear();
+
+            }
+
+            //En caso de que se quiera usar un nombre de usuario ya registrado
+            else if (u.getUsername() == user)
+            {
+                message.setText("please try another username this has already been registered");
+                message.setIcon(QMessageBox::Warning);
+                message.exec();
+                ui->newUserLE->clear();
+            }
+
+            //En caso de que se quiera usar un correo electronico ya registrado
+            else if(u.getEmail() == email)
+            {
+                message.setText("please try another email this has already been registered");
+                message.setIcon(QMessageBox::Warning);
+                message.exec();
+                ui->emailLE->clear();
+            }
+        }
+    }
+
+    //En caso de que la dirección de correo electronico no sea valida
+    else
+    {
+        message.setText("Invalid email adress");
+        message.setIcon(QMessageBox::Warning);
+        message.exec();
+    }
+}
+
+//Valida que el correo introducido tenga una estructura valida
 bool MainWindow::checkEmail(const QString &value)
 {
     bool result = true; //Variable que voy a retornar
@@ -203,14 +484,13 @@ void MainWindow::saveDB()
     QString currentTimeString = currentTime.toString("dd/MM/yyyy") + " " + currentTime.toString("hh:mm:ss");
     QJsonObject shopping;
     shopping[currentTimeString] = chart;
-    int index = std::distance(users.begin(), currentUser);
-    User u = users[index];
+    User u = users[currentUser];
     QJsonArray purchase = u.getShoppingHistory();
     purchase.append(shopping);
 
-    QJsonObject user = dbuArray[index].toObject();
+    QJsonObject user = dbuArray[currentUser].toObject();
     user["purchase"] = purchase;
-    dbuArray.replace(index,user);
+    dbuArray.replace(currentUser,user);
 
     QJsonObject jsonObj;
     QJsonDocument jsonDoc;
@@ -263,499 +543,7 @@ void MainWindow::loadDB()
     }
 }
 
-//Metodo para identificar repeticiones de datos al momento de crear un nuevo usuario
-void MainWindow::validateData()
-{
-    QMessageBox message;
-    QString user = ui->newUserLE->text();
-    QString email = ui->emailLE->text();
-    //Si el email introducidio es valido
-    if(checkEmail(email) == true)
-    {
-        //Busca que no haya un nombre de usuario o email en el vector users
-        vector <User> :: iterator it; //iterador para la función find if
-        it = find_if(users.begin(),users.end(),[&user, &email](User u) -> bool
-        {
-            return (u.getUsername() == user || u.getEmail() == email);
-        }
-            );
-
-        //Si no lo hay, registra el usuario sin problema
-        if(it == users.end())
-        {
-            QJsonObject jsonObj;
-            User u;
-            u.setUsername(ui->newUserLE->text());
-            u.setEmail(ui->emailLE->text());
-            u.setPassword(ui->newPasswordLE->text());
-
-            users.push_back(u);
-            message.setText("New user created");
-            message.exec();
-            ui->newUserLE->clear();
-            ui->newPasswordLE->clear();
-            ui->emailLE->clear();
-
-            //Se agrega al final del arreglo json el usuario registrado
-            jsonObj["name"] = u.getUsername();
-            jsonObj["email"] = u.getEmail();
-            jsonObj["password"] = u.getPassword();
-            dbuArray.append(jsonObj);
-        }
-        else
-        {
-            User u = *it;
-
-            //En caso que se este tratando de registrar un usuario ya creado
-            if(u.getUsername() == user && u.getEmail() == email)
-            {
-                message.setText("This user is already registred");
-                message.setIcon(QMessageBox::Warning);
-                message.exec();
-                ui->newUserLE->clear();
-                ui->newPasswordLE->clear();
-                ui->emailLE->clear();
-
-            }
-
-            //En caso de que se quiera usar un nombre de usuario ya registrado
-            else if (u.getUsername() == user)
-            {
-                message.setText("please try another username this has already been registered");
-                message.setIcon(QMessageBox::Warning);
-                message.exec();
-                ui->newUserLE->clear();
-            }
-
-            //En caso de que se quiera usar un correo electronico ya registrado
-            else if(u.getEmail() == email)
-            {
-                message.setText("please try another email this has already been registered");
-                message.setIcon(QMessageBox::Warning);
-                message.exec();
-                ui->emailLE->clear();
-            }
-        }
-    }
-
-    //En caso de que la dirección de correo electronico no sea valida
-    else
-    {
-        message.setText("Invalid email adress");
-        message.setIcon(QMessageBox::Warning);
-        message.exec();
-    }
-}
-
-//viewSW (verStackedWidget)Son todos de slots
-void MainWindow::on_usernameLE_textChanged(const QString &arg1)
-{
-    /*cada vez que haya un cambio de texto en la casilla de usernameLE
-    llamo al metodo para ver si se activa o no el boton de login*/
-    Q_UNUSED(arg1);
-    enableLoginPB();
-}
-
-void MainWindow::on_passwordLE_textChanged(const QString &arg1)
-{
-    Q_UNUSED (arg1);
-    enableLoginPB();
-}
-
-void MainWindow::on_newUserLE_textChanged(const QString &arg1)
-{
-    Q_UNUSED (arg1);
-    enableSingUpPB();
-}
-
-void MainWindow::on_emailLE_textChanged(const QString &arg1)
-{
-    Q_UNUSED (arg1);
-    enableSingUpPB();
-}
-
-void MainWindow::on_newPasswordLE_textChanged(const QString &arg1)
-{
-    Q_UNUSED (arg1);
-    enableSingUpPB();
-}
-
-//Accion cuando se presiona el boton signUpPB
-void MainWindow::on_signUpPB_clicked()
-{
-    validateData();
-}
-
-void MainWindow::on_loginPB_clicked()
-{
-    validateUser();
-}
-
-void MainWindow::openFile()
-{
-    QString name;
-    //Busca el archivo dentro del sistema de archivos, recibe como argumentos:
-    //el widget, la leyenda que aparecera, donde se empieza la busqueda
-    //("" para que se busque en la carpeta contenedora del ejecutable),cual es el filtro que se aplica
-    name = QFileDialog::getOpenFileName(this,"Select Database","","JSON files (*.json)");
-
-    if (name.length() > 0)
-    {
-        dbFile.setFileName(name);
-        ui->loginGB->setEnabled(true);
-        ui->signUpGB->setEnabled(true);
-        loadDB();
-    }
-}
-
-void MainWindow::setProducts()
-{
-
-    for(int i(0); i < dbpArray.size(); i++)
-    {
-        productWidget* p;
-        QJsonObject obj = dbpArray[i].toObject();
-        p = new productWidget (this);
-        p->setId(obj["id"].toString());
-        p->setName(obj["name"].toString());
-        p->setPrice(obj["price"].toDouble());
-        connect(p,SIGNAL(addItem(QString,int)),this,SLOT(addToChart(QString,int)));
-        products[i] = p;
-    }
-}
-
-void MainWindow::clearGrid()
-{
-    QLayoutItem *item;
-    while((item = ui->gridProducts->layout()->takeAt(0)) != nullptr)
-    {
-        delete item->widget();
-        delete item;
-    }
-    setProducts();
-}
-
-string MainWindow::convertToLowerCase(string cad)
-{
-    for(size_t i = 0; i < cad.size(); i++)
-    {
-        cad[i] = toupper(cad[i]);
-    }
-    return cad;
-}
-
-void MainWindow::invalidSearch()
-{
-    QMessageBox advice;
-    advice.setText("No se encontro ningún producto con el patron deseado");
-    advice.exec();
-    ui->search->clear();
-    if(ui->filters->currentIndex() > 0)
-    {
-        on_filters_currentIndexChanged(ui->filters->currentIndex());
-    }
-    else
-    {
-        on_categories_currentIndexChanged(ui->categories->currentIndex());
-    }
-}
-
-//Mostrar los productos en pantalla
-void MainWindow::showAllDepartments()
-{
-    int x = 0, y = 0;
-    for(size_t i = 0; i < products.size(); i++)
-    {
-        ui->gridProducts->addWidget(products[i], x, y);
-        y++;
-        if(y == 4)
-        {
-            y = 0;
-            x++;
-        }
-    }
-}
-
-void MainWindow::showSearchAllDepartments(const QString input)
-{
-    int x = 0, y = 0;
-    for(size_t i = 0; i < products.size(); i++)
-    {
-        productWidget *obj;
-        obj = products[i];
-        if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
-        {
-            ui->gridProducts->addWidget(products[i], x, y);
-            y++;
-            if(y == 4)
-            {
-                y = 0;
-                x++;
-            }
-        }
-    }
-    if(x == 0 && y == 0)
-    {
-        invalidSearch();
-    }
-}
-
-void MainWindow::showFoodDrinks()
-{
-    int x = 0, y = 0;
-    for(size_t i = 0; i < products.size(); i++)
-    {
-        productWidget * obj;
-        obj = products[i];
-        QString id = obj->getId();
-        string idString = id.toStdString();
-        if(strncmp(idString.c_str(), "AB", 2) == 0)
-        {
-            ui->gridProducts->addWidget(obj, x, y);
-            y++;
-            if(y == 4)
-            {
-                y = 0;
-                x++;
-            }
-        }
-    }
-}
-
-void MainWindow::showSearchFoodDrinks(const QString input)
-{
-    int x = 0, y = 0;
-    for(size_t i = 0; i < products.size(); i++)
-    {
-        productWidget * obj;
-        obj = products[i];
-        QString id = obj->getId();
-        string idString = id.toStdString();
-        if(strncmp(idString.c_str(), "AB", 2) == 0)
-        {
-            if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
-            {
-                ui->gridProducts->addWidget(products[i], x, y);
-                y++;
-                if(y == 4)
-                {
-                    y = 0;
-                    x++;
-                }
-            }
-        }
-    }
-    if(x == 0 && y == 0)
-    {
-        invalidSearch();
-    }
-}
-
-void MainWindow::showBooks()
-{
-    int x = 0, y = 0;
-    for(size_t i = 0; i < products.size(); i++)
-    {
-        productWidget * obj;
-        obj = products[i];
-        QString id = obj->getId();
-        string idString = id.toStdString();
-        if(strncmp(idString.c_str(), "L", 1) == 0)
-        {
-            ui->gridProducts->addWidget(obj, x, y);
-            y++;
-            if(y == 4)
-            {
-                y = 0;
-                x++;
-            }
-        }
-    }
-}
-
-void MainWindow::showSearchBooks(const QString input)
-{
-    int x = 0, y = 0;
-    for(size_t i = 0; i < products.size(); i++)
-    {
-        productWidget * obj;
-        obj = products[i];
-        QString id = obj->getId();
-        string idString = id.toStdString();
-        if(strncmp(idString.c_str(), "L", 1) == 0)
-        {
-            if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
-            {
-                ui->gridProducts->addWidget(products[i], x, y);
-                y++;
-                if(y == 4)
-                {
-                    y = 0;
-                    x++;
-                }
-            }
-        }
-    }
-    if( x == 0 && y == 0)
-    {
-        invalidSearch();
-    }
-}
-
-void MainWindow::showElectronics()
-{
-    int x = 0, y = 0;
-    for(size_t i = 0; i < products.size(); i++)
-    {
-        productWidget * obj;
-        obj = products[i];
-        QString id = obj->getId();
-        string idString = id.toStdString();
-        if(strncmp(idString.c_str(), "E", 1) == 0)
-        {
-            ui->gridProducts->addWidget(obj, x, y);
-            y++;
-            if(y == 4)
-            {
-                y = 0;
-                x++;
-            }
-        }
-    }
-}
-
-void MainWindow::showSearchElectronics(const QString input)
-{
-    int x = 0, y = 0;
-    for(size_t i = 0; i < products.size(); i++)
-    {
-        productWidget * obj;
-        obj = products[i];
-        QString id = obj->getId();
-        string idString = id.toStdString();
-        if(strncmp(idString.c_str(), "E", 1) == 0)
-        {
-            if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
-            {
-                ui->gridProducts->addWidget(products[i], x, y);
-                y++;
-                if(y == 4)
-                {
-                    y = 0;
-                    x++;
-                }
-            }
-        }
-    }
-    if(x == 0 && y == 0)
-    {
-        invalidSearch();
-    }
-}
-
-void MainWindow::showHomeKitchen()
-{
-    int x = 0, y = 0;
-    for(size_t i = 0; i < products.size(); i++)
-    {
-        productWidget * obj;
-        obj = products[i];
-        QString id = obj->getId();
-        string idString = id.toStdString();
-        if(strncmp(idString.c_str(), "HC", 2) == 0)
-        {
-            ui->gridProducts->addWidget(obj, x, y);
-            y++;
-            if(y == 4)
-            {
-                y = 0;
-                x++;
-            }
-        }
-    }
-}
-
-void MainWindow::showSearchHomeKitchen(const QString input)
-{
-    int x = 0, y = 0;
-    for(size_t i = 0; i < products.size(); i++)
-    {
-        productWidget * obj;
-        obj = products[i];
-        QString id = obj->getId();
-        string idString = id.toStdString();
-        if(strncmp(idString.c_str(), "HC", 2) == 0)
-        {
-            if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
-            {
-                ui->gridProducts->addWidget(products[i], x, y);
-                y++;
-                if(y == 4)
-                {
-                    y = 0;
-                    x++;
-                }
-            }
-        }
-    }
-    if(x == 0 && y == 0)
-    {
-        invalidSearch();
-    }
-}
-
-void MainWindow::showSportOutdoors()
-{
-    int x = 0, y = 0;
-    for(size_t i = 0; i < products.size(); i++)
-    {
-        productWidget * obj;
-        obj = products[i];
-        QString id = obj->getId();
-        string idString = id.toStdString();
-        if(strncmp(idString.c_str(), "D", 1) == 0)
-        {
-            ui->gridProducts->addWidget(obj, x, y);
-            y++;
-            if(y == 4)
-            {
-                y = 0;
-                x++;
-            }
-        }
-    }
-}
-
-void MainWindow::showSearchSportOutdoors(const QString input)
-{
-    int x = 0, y = 0;
-    for(size_t i = 0; i < products.size(); i++)
-    {
-        productWidget * obj;
-        obj = products[i];
-        QString id = obj->getId();
-        string idString = id.toStdString();
-        if(strncmp(idString.c_str(), "D", 1) == 0)
-        {
-            if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
-            {
-                ui->gridProducts->addWidget(products[i], x, y);
-                y++;
-                if(y == 4)
-                {
-                    y = 0;
-                    x++;
-                }
-            }
-        }
-    }
-    if(x == 0 && y == 0)
-    {
-        invalidSearch();
-    }
-}
-//Aqui termina mostrar los productos en pantalla
-
+//Mensaje de error desplejable en pantalla
 void MainWindow::putErrorMessage()
 {
     QMessageBox advice;
@@ -764,6 +552,7 @@ void MainWindow::putErrorMessage()
     advice.exec();
 }
 
+//Evalua si muestra el item 0 del QComboBox filters, si recibe 0 lo muestra, 1 lo oculta
 void MainWindow::evaluateHideSort(const int pos)
 {
     if(pos == 0)
@@ -789,6 +578,63 @@ void MainWindow::evaluateHideSort(const int pos)
     }
 }
 
+//Vuelve a cargar los productos cuando son eliminados del grid
+void MainWindow::setProducts()
+{
+
+    for(int i(0); i < dbpArray.size(); i++)
+    {
+        productWidget* p;
+        QJsonObject obj = dbpArray[i].toObject();
+        p = new productWidget (this);
+        p->setId(obj["id"].toString());
+        p->setName(obj["name"].toString());
+        p->setPrice(obj["price"].toDouble());
+        connect(p,SIGNAL(addItem(QString,int)),this,SLOT(addToChart(QString,int)));
+        products[i] = p;
+    }
+}
+
+//Elimina los productos del grid
+void MainWindow::clearGrid()
+{
+    QLayoutItem *item;
+    while((item = ui->gridProducts->layout()->takeAt(0)) != nullptr)
+    {
+        delete item->widget();
+        delete item;
+    }
+    setProducts();
+}
+
+//Convierte una cadena a letras minusculas
+string MainWindow::convertToLowerCase(string cad)
+{
+    for(size_t i = 0; i < cad.size(); i++)
+    {
+        cad[i] = toupper(cad[i]);
+    }
+    return cad;
+}
+
+//Despliega un mensaje de error si la busqueda por patron no da resultado
+void MainWindow::invalidSearch()
+{
+    QMessageBox advice;
+    advice.setText("No se encontro ningún producto con el patron deseado");
+    advice.exec();
+    ui->search->clear();
+    if(ui->filters->currentIndex() > 0)
+    {
+        on_filters_currentIndexChanged(ui->filters->currentIndex());
+    }
+    else
+    {
+        on_categories_currentIndexChanged(ui->categories->currentIndex());
+    }
+}
+
+//Funcion complementaria para ordenar los productos
 void MainWindow::changeObjects(const int i, const int j)
 {
     productWidget *temp;
@@ -798,7 +644,7 @@ void MainWindow::changeObjects(const int i, const int j)
     products[j] = temp;
 }
 
-//Acomoda los productos de mayor a menor
+//Acomoda los productos de mayor a menor, menor a mayor dependiendo el tipo de acomodo deseado
 void MainWindow::sortProducts(const int type)
 {
     clearGrid();
@@ -851,6 +697,7 @@ void MainWindow::sortProducts(const int type)
     }
 }
 
+//Muestra por precio y evalua si hay que respeta busqueda por patron
 void MainWindow::showByPrice(const int type,const int categorie)
 {
     QString word = ui->search->text();
@@ -862,7 +709,7 @@ void MainWindow::showByPrice(const int type,const int categorie)
     }
     else
     {
-        //En caso de que no haya, simplemente ordena los productos
+        //En caso de que no haya, simplemente ordena los productos y los muestra
         sortProducts(type);
         switch(categorie)
         {
@@ -891,119 +738,312 @@ void MainWindow::showByPrice(const int type,const int categorie)
     }
 }
 
-void MainWindow::on_categories_currentIndexChanged(int index)
+
+//Funciones para mostrar los productos en pantalla
+
+//Mostrar todos los productos en pantalla
+void MainWindow::showAllDepartments()
 {
-    switch (index)
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
     {
-        case 0:
-            ui->search->clear();
-            if(printingProductsFlag == 0)
+        ui->gridProducts->addWidget(products[i], x, y);
+        y++;
+        if(y == 4)
+        {
+            y = 0;
+            x++;
+        }
+    }
+}
+
+//Mostrar la busqueda por patron en todos los productos
+void MainWindow::showSearchAllDepartments(const QString input)
+{
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget *obj;
+        obj = products[i];
+        if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
+        {
+            ui->gridProducts->addWidget(products[i], x, y);
+            y++;
+            if(y == 4)
             {
-                showAllDepartments();
-                printingProductsFlag = 1;
+                y = 0;
+                x++;
             }
-            else
+        }
+    }
+    if(x == 0 && y == 0)
+    {
+        invalidSearch();
+    }
+}
+
+//Mostrar la categoria comida y bebidas
+void MainWindow::showFoodDrinks()
+{
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "AB", 2) == 0)
+        {
+            ui->gridProducts->addWidget(obj, x, y);
+            y++;
+            if(y == 4)
             {
-                clearGrid();
-                evaluateHideSort(0);
-                showAllDepartments();
+                y = 0;
+                x++;
             }
-            break;
-        case 1:
-            ui->search->clear();
-            clearGrid();
-            evaluateHideSort(0);
-            showFoodDrinks();
-            break;
-        case 2:
-            ui->search->clear();
-            clearGrid();
-            evaluateHideSort(0);
-            showBooks();
-            break;
-        case 3:
-            ui->search->clear();
-            clearGrid();
-            evaluateHideSort(0);
-            showElectronics();
-            break;
-        case 4:
-            ui->search->clear();
-            clearGrid();
-            evaluateHideSort(0);
-            showHomeKitchen();
-            break;
-        case 5:
-            ui->search->clear();
-            clearGrid();
-            evaluateHideSort(0);
-            showSportOutdoors();
-            break;
-        default:
-            putErrorMessage();
-            break;
+        }
     }
 }
 
-void MainWindow::on_filters_currentIndexChanged(int index)
+//Mostrar la busqueda por patron en comida y bebidas
+void MainWindow::showSearchFoodDrinks(const QString input)
 {
-    switch (index)
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
     {
-        case 0:
-            break;
-        case 1:
-            evaluateHideSort(1);
-            showByPrice(index,ui->categories->currentIndex());
-            break;
-        case 2:
-            evaluateHideSort(1);
-            showByPrice(index,ui->categories->currentIndex());
-            break;
-        default:
-            putErrorMessage();
-            break;
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "AB", 2) == 0)
+        {
+            if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
+            {
+                ui->gridProducts->addWidget(products[i], x, y);
+                y++;
+                if(y == 4)
+                {
+                    y = 0;
+                    x++;
+                }
+            }
+        }
+    }
+    if(x == 0 && y == 0)
+    {
+        invalidSearch();
     }
 }
 
-void MainWindow::on_search_returnPressed()
+//Mostrar la categoria libros
+void MainWindow::showBooks()
 {
-    clearGrid();
-    int filtersIndex = ui->filters->currentIndex();
-    int categorieIndex = ui->categories->currentIndex();
-    if(filtersIndex > 0)
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
     {
-        sortProducts(filtersIndex);
-    }
-    switch(categorieIndex)
-    {
-        case 0:
-            showSearchAllDepartments(ui->search->text());
-            break;
-        case 1:
-            showSearchFoodDrinks(ui->search->text());
-            break;
-        case 2:
-            showSearchBooks(ui->search->text());
-            break;
-        case 3:
-            showSearchElectronics(ui->search->text());
-            break;
-        case 4:
-            showSearchHomeKitchen(ui->search->text());
-            break;
-        case 5:
-            showSearchSportOutdoors(ui->search->text());
-            break;
-        default:
-            putErrorMessage();
-            break;
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "L", 1) == 0)
+        {
+            ui->gridProducts->addWidget(obj, x, y);
+            y++;
+            if(y == 4)
+            {
+                y = 0;
+                x++;
+            }
+        }
     }
 }
 
-void MainWindow::addToChart(QString item, int amount)
+//Mostrar la busqueda por patron en libros
+void MainWindow::showSearchBooks(const QString input)
 {
-    QJsonObject jsonObjectSales;
-    jsonObjectSales["id"] = item;
-    jsonObjectSales["units"] = amount;
-    chart.append(jsonObjectSales);
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "L", 1) == 0)
+        {
+            if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
+            {
+                ui->gridProducts->addWidget(products[i], x, y);
+                y++;
+                if(y == 4)
+                {
+                    y = 0;
+                    x++;
+                }
+            }
+        }
+    }
+    if( x == 0 && y == 0)
+    {
+        invalidSearch();
+    }
 }
+
+//Mostrar la categoria electronicos
+void MainWindow::showElectronics()
+{
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "E", 1) == 0)
+        {
+            ui->gridProducts->addWidget(obj, x, y);
+            y++;
+            if(y == 4)
+            {
+                y = 0;
+                x++;
+            }
+        }
+    }
+}
+
+//Mostrar la busqueda por patron en electronicos
+void MainWindow::showSearchElectronics(const QString input)
+{
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "E", 1) == 0)
+        {
+            if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
+            {
+                ui->gridProducts->addWidget(products[i], x, y);
+                y++;
+                if(y == 4)
+                {
+                    y = 0;
+                    x++;
+                }
+            }
+        }
+    }
+    if(x == 0 && y == 0)
+    {
+        invalidSearch();
+    }
+}
+
+//Mostrar la categoria cocina y hogar
+void MainWindow::showHomeKitchen()
+{
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "HC", 2) == 0)
+        {
+            ui->gridProducts->addWidget(obj, x, y);
+            y++;
+            if(y == 4)
+            {
+                y = 0;
+                x++;
+            }
+        }
+    }
+}
+
+//Mostar la busqueda por patron en cocina y hogar
+void MainWindow::showSearchHomeKitchen(const QString input)
+{
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "HC", 2) == 0)
+        {
+            if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
+            {
+                ui->gridProducts->addWidget(products[i], x, y);
+                y++;
+                if(y == 4)
+                {
+                    y = 0;
+                    x++;
+                }
+            }
+        }
+    }
+    if(x == 0 && y == 0)
+    {
+        invalidSearch();
+    }
+}
+
+//Mostrar la categoria deportes y aire libre
+void MainWindow::showSportOutdoors()
+{
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "D", 1) == 0)
+        {
+            ui->gridProducts->addWidget(obj, x, y);
+            y++;
+            if(y == 4)
+            {
+                y = 0;
+                x++;
+            }
+        }
+    }
+}
+
+//Mostrar la busqueda por patron en deportes y aire libre
+void MainWindow::showSearchSportOutdoors(const QString input)
+{
+    int x = 0, y = 0;
+    for(size_t i = 0; i < products.size(); i++)
+    {
+        productWidget * obj;
+        obj = products[i];
+        QString id = obj->getId();
+        string idString = id.toStdString();
+        if(strncmp(idString.c_str(), "D", 1) == 0)
+        {
+            if(convertToLowerCase(obj->getName().toStdString()).find(convertToLowerCase(input.toStdString()),0) < obj->getName().toStdString().length())
+            {
+                ui->gridProducts->addWidget(products[i], x, y);
+                y++;
+                if(y == 4)
+                {
+                    y = 0;
+                    x++;
+                }
+            }
+        }
+    }
+    if(x == 0 && y == 0)
+    {
+        invalidSearch();
+    }
+}
+
