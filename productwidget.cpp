@@ -14,6 +14,26 @@ productWidget::~productWidget()
     delete ui;
 }
 
+//Slots
+void productWidget::on_addButton_clicked()
+{
+    emit addItem(id, ui->amountSpinBox->value());
+    ui->amountSpinBox->setValue(0);
+}
+
+void productWidget::on_amountSpinBox_valueChanged(int arg1)
+{
+    if(arg1 > 0)
+    {
+        ui->addButton->setEnabled(true);
+    }
+    else
+    {
+        ui->addButton->setEnabled(false);
+    }
+}
+
+//Metodos
 QString productWidget::getId() const
 {
     return id;
@@ -47,20 +67,3 @@ void productWidget::setPrice(const double &value)
     ui->productPrice->setText("$" + QString::number(price));
 }
 
-void productWidget::on_addButton_clicked()
-{
-    emit addItem(id, ui->amountSpinBox->value());
-    ui->amountSpinBox->setValue(0);
-}
-
-void productWidget::on_amountSpinBox_valueChanged(int arg1)
-{
-    if(arg1 > 0)
-    {
-        ui->addButton->setEnabled(true);
-    }
-    else
-    {
-        ui->addButton->setEnabled(false);
-    }
-}

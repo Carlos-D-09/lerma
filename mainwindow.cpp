@@ -210,7 +210,7 @@ void MainWindow::on_search_returnPressed()
     }
 }
 
-//Agrega las compras del dias al carrito
+//Agrega las compras del dia al carrito
 void MainWindow::addToChart(QString item, int amount)
 {
     QJsonObject jsonObjectSales;
@@ -279,12 +279,8 @@ void MainWindow::validateUser()
     //En caso contrario paso a evaluar si hay coincidencia en la contraseña
     else
     {
-        it = find_if(users.begin(), users.end(), [&password](User u) -> bool
-        {
-            return u.getPassword() == password;
-        }
-            );
-        if(it == users.end())
+        User u = users[distance(users.begin(), it)];
+        if(u.getPassword() != password)
         {
             message.setText("Incorrect password, please try again");
             message.setIcon(QMessageBox::Warning);
@@ -480,27 +476,42 @@ bool MainWindow::checkEmail(const QString &value)
 
 void MainWindow::saveDB()
 {
-    QDateTime currentTime = QDateTime::currentDateTime();
-    QString currentTimeString = currentTime.toString("dd/MM/yyyy") + " " + currentTime.toString("hh:mm:ss");
-    QJsonObject shopping;
-    shopping[currentTimeString] = chart;
-    User u = users[currentUser];
-    QJsonArray purchase = u.getShoppingHistory();
-    purchase.append(shopping);
+    if(chart.size() > 0)
+    {
+        QDateTime currentTime = QDateTime::currentDateTime();
+        QString currentTimeString = currentTime.toString("dd/MM/yyyy") + " " + currentTime.toString("hh:mm:ss");
+        QJsonObject shopping;
+        shopping[currentTimeString] = chart;
+        User u = users[currentUser];
+        QJsonArray purchase = u.getShoppingHistory();
+        purchase.append(shopping);
 
-    QJsonObject user = dbuArray[currentUser].toObject();
-    user["purchase"] = purchase;
-    dbuArray.replace(currentUser,user);
+        QJsonObject user = dbuArray[currentUser].toObject();
+        user["purchase"] = purchase;
+        dbuArray.replace(currentUser,user);
 
-    QJsonObject jsonObj;
-    QJsonDocument jsonDoc;
-    jsonObj["users"] = dbuArray;
-    jsonObj["products"] = dbpArray;
-    jsonDoc = QJsonDocument(jsonObj);
+        QJsonObject jsonObj;
+        QJsonDocument jsonDoc;
+        jsonObj["users"] = dbuArray;
+        jsonObj["products"] = dbpArray;
+        jsonDoc = QJsonDocument(jsonObj);
 
-    dbFile.open(QIODevice::WriteOnly);
-    dbFile.write(jsonDoc.toJson());
-    dbFile.close();
+        dbFile.open(QIODevice::WriteOnly);
+        dbFile.write(jsonDoc.toJson());
+        dbFile.close();
+    }
+    else
+    {
+        QJsonObject jsonObj;
+        QJsonDocument jsonDoc;
+        jsonObj["users"] = dbuArray;
+        jsonObj["products"] = dbpArray;
+        jsonDoc = QJsonDocument(jsonObj);
+
+        dbFile.open(QIODevice::WriteOnly);
+        dbFile.write(jsonDoc.toJson());
+        dbFile.close();
+    }
 }
 
 void MainWindow::loadDB()
@@ -581,7 +592,6 @@ void MainWindow::evaluateHideSort(const int pos)
 //Vuelve a cargar los productos cuando son eliminados del grid
 void MainWindow::setProducts()
 {
-
     for(int i(0); i < dbpArray.size(); i++)
     {
         productWidget* p;

@@ -13,16 +13,6 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
-#include <iomanip>
-#include <QMainWindow>
-#include <QMessageBox>
-#include <vector>
-#include <QVector>
-#include <user.h>
-#include "productwidget.h"
-#include <QAction>
-#include <QFile>
-#include <QFileDialog>
 #include <string>
 #include <QDateTime>
 
