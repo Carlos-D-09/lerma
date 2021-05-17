@@ -19,7 +19,8 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     user.h \
-    productwidget.h
+    productwidget.h \
+    graph.h
 
 FORMS    += mainwindow.ui \
     productwidget.ui

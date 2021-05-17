@@ -539,6 +539,8 @@ void MainWindow::loadDB()
         users.push_back(u);
     }
 
+    createGraph();
+
     dbpArray = jsonObj["products"].toArray();
 
     for(int i(0); i < dbpArray.size(); i++)
@@ -748,6 +750,46 @@ void MainWindow::showByPrice(const int type,const int categorie)
     }
 }
 
+
+void MainWindow::createGraph()
+{
+    QJsonArray purchases;
+    for(int i = 0; i < dbuArray.size(); i++)
+    {
+        QJsonObject u = dbuArray[i].toObject();
+        if(u.contains("purchase"))
+        {
+            purchases = u["purchase"].toArray();
+            for(int x = 0; x < purchases.size(); x++)
+            {
+                QStringList keys = purchases[x].toObject().keys();
+                QString key = keys[0];
+                QJsonObject currentPurchase = purchases[x].toObject();
+                QJsonArray currentPurchaseArray = currentPurchase[key].toArray();
+                QJsonObject origin = currentPurchaseArray[0].toObject();
+                string originString = origin["id"].toString().toStdString();
+                for(int y = 1; y < currentPurchaseArray.size(); y++)
+                {
+                    QJsonObject destinie = currentPurchaseArray[y].toObject();
+                    string destinieString = destinie["id"].toString().toStdString();
+                    if(graph.isEdge(originString,destinieString) == true)
+                    {
+                        int cost = graph.getCost(originString, destinieString);
+                        cost++;
+                        graph.createEdge(originString, destinieString,cost);
+                    }
+                    else
+                    {
+                        graph.createEdge(originString, destinieString,1);
+                    }
+                }
+            }
+        }
+    }
+    graph.printData();
+}
+
+//Aqui terminan los metodos
 
 //Funciones para mostrar los productos en pantalla
 

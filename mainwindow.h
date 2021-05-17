@@ -15,6 +15,7 @@
 #include <QJsonDocument>
 #include <string>
 #include <QDateTime>
+#include "graph.h"
 
 using namespace std;
 
@@ -70,6 +71,7 @@ private:
     QJsonArray chart;
     int printingProductsFlag = 0;
     bool hideSort;
+    Graph <string> graph;
 
     void enableLoginPB();
     void enableSingUpPB();
@@ -106,6 +108,7 @@ private:
     void sortProducts(const int type);
     string convertToLowerCase(string cad);
     void invalidSearch();
+    void createGraph();
 
 };
 
