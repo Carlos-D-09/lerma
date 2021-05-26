@@ -217,6 +217,10 @@ void MainWindow::addToChart(QString item, int amount)
     jsonObjectSales["id"] = item;
     jsonObjectSales["units"] = amount;
     chart.append(jsonObjectSales);
+    createGraph();
+    clearGridRecommendation();
+    generateRecommendation(item);
+    showRecomendation();
 }
 
 //Aqui terminan los slots
@@ -554,6 +558,7 @@ void MainWindow::loadDB()
         connect(p,SIGNAL(addItem(QString,int)),this,SLOT(addToChart(QString,int)));
         products.push_back(p);
     }
+    generateRandomRecommendation();
 }
 
 //Mensaje de error desplejable en pantalla
@@ -617,6 +622,18 @@ void MainWindow::clearGrid()
         delete item;
     }
     setProducts();
+}
+
+//Limpia el grid de la recomendaciones
+void MainWindow::clearGridRecommendation()
+{
+    QLayoutItem *item;
+    while((item = ui->gridRecomendation->layout()->takeAt(0)) != nullptr)
+    {
+        delete item ->widget();
+        delete item;
+        productWidgetRecomendation.pop_back();
+    }
 }
 
 //Convierte una cadena a letras minusculas
@@ -750,7 +767,6 @@ void MainWindow::showByPrice(const int type,const int categorie)
     }
 }
 
-
 void MainWindow::createGraph()
 {
     QJsonArray purchases;
@@ -789,6 +805,119 @@ void MainWindow::createGraph()
     graph.printData();
 }
 
+void MainWindow::generateRandomRecommendation()
+{
+    int x = 0;
+    while(x < 5)
+    {
+        bool validation;
+        int positions[5];
+        do
+        {
+            validation = true;
+            srand(time(NULL));
+            int pos = rand() % products.size();
+            QJsonObject obj = dbpArray[pos].toObject();
+            productWidget* p = new productWidget (this);
+            p->setId(obj["id"].toString());
+            p->setName(obj["name"].toString());
+            p->setPrice(obj["price"].toDouble());
+            connect(p,SIGNAL(addItem(QString,int)),this,SLOT(addToChart(QString,int)));
+            if(x == 0)
+            {
+                positions[x] = pos;
+                productWidgetRecomendation.push_back(p);
+            }
+            else
+            {
+                int y = 0;
+                while(y < x)
+                {
+                    if(positions[y] == pos)
+                    {
+                        validation = false;
+                        break;
+                    }
+                    y++;
+                }
+                if(validation == true)
+                {
+                    positions[x] = pos;
+                    productWidgetRecomendation.push_back(p);
+                }
+            }
+        }
+        while(validation == false);
+        x++;
+    }
+}
+
+void MainWindow::generateRecommendation(const QString product)
+{
+    map<string,int> neighbors;
+    neighbors = graph.getNeighbors(product.toStdString());
+    map<string,int>::iterator neighbor = neighbors.begin();
+    for(; neighbor != neighbors.end(); neighbor++)
+    {
+        string id = neighbor->first;
+        int cost = neighbor->second;
+        pair<string, int> aux(id,cost);
+        if(productRecommendation.size() == 0)
+        {
+            productRecommendation.push(aux);
+        }
+        else
+        {
+            priority_queue<PAIR,vector<PAIR>,comp> auxQueue;
+            auxQueue = productRecommendation;
+            pair<string,int>aux2(id,cost);
+            bool validity = true;
+            while(auxQueue.size()>0)
+            {
+                aux2 = auxQueue.top();
+                if(aux.first == aux2.first)
+                {
+                    validity = false;
+                    break;
+                }
+                auxQueue.pop();
+            }
+            if(validity == true)
+            {
+                productRecommendation.push(aux);
+            }
+        }
+    }
+    setProductWidgetRecommendation();
+}
+
+void MainWindow::setProductWidgetRecommendation()
+{
+    priority_queue<PAIR,vector<PAIR>,comp> aux;
+    aux = productRecommendation;
+    PAIR node;
+    for(size_t i = 0; i < productRecommendation.size() && i < 5; i++)
+    {
+        pair<string, int> node = aux.top();
+        string id = node.first;
+        for(int x = 0; x < dbpArray.size(); x++)
+        {
+            QJsonObject obj = dbpArray[x].toObject();
+            if(obj["id"].toString().toStdString() == id)
+            {
+                productWidget* p = new productWidget(this);
+                p->setId(obj["id"].toString());
+                p->setName(obj["name"].toString());
+                p->setPrice(obj["price"].toDouble());
+                connect(p,SIGNAL(addItem(QString,int)),this,SLOT(addToChart(QString,int)));
+                productWidgetRecomendation.push_back(p);
+            }
+        }
+        aux.pop();
+    }
+    ui->reommendation->setText("Bought together");
+}
+
 //Aqui terminan los metodos
 
 //Funciones para mostrar los productos en pantalla
@@ -807,6 +936,7 @@ void MainWindow::showAllDepartments()
             x++;
         }
     }
+    showRecomendation();
 }
 
 //Mostrar la busqueda por patron en todos los productos
@@ -1096,6 +1226,17 @@ void MainWindow::showSearchSportOutdoors(const QString input)
     if(x == 0 && y == 0)
     {
         invalidSearch();
+    }
+}
+
+void MainWindow::showRecomendation()
+{
+    int y = 0, x = 0;
+    size_t cont = productWidgetRecomendation.size();
+    for(size_t i = 0; i < cont; i++)
+    {
+        ui->gridRecomendation->addWidget(productWidgetRecomendation[i], x, y);
+        y++;
     }
 }
 

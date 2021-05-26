@@ -66,4 +66,3 @@ void productWidget::setPrice(const double &value)
     price = float(value);
     ui->productPrice->setText("$" + QString::number(price));
 }
-

@@ -16,6 +16,10 @@
 #include <string>
 #include <QDateTime>
 #include "graph.h"
+#include <queue>
+#include <ctime>
+
+typedef pair<string, int> PAIR;
 
 using namespace std;
 
@@ -59,11 +63,22 @@ private slots:
     void addToChart(QString item, int amount);
 
 private:
+    struct comp
+    {
+        constexpr bool operator ()(const PAIR &obj1, const PAIR &obj2)
+        const noexcept
+        {
+            return obj1.second < obj2.second;
+        }
+    };
+
     Ui::MainWindow *ui;
 
     vector<User> users;
     int currentUser;
     vector<productWidget*> products;
+    vector<productWidget*> productWidgetRecomendation;
+    priority_queue<PAIR,vector<PAIR>,comp> productRecommendation;
     QAction* openFileAction;
     QFile dbFile;
     QJsonArray dbuArray;
@@ -82,6 +97,18 @@ private:
     void loadDB();
     void setProducts();
     void clearGrid();
+    void evaluateHideSort(const int pos);
+    void putErrorMessage();
+    void showByPrice(const int type, const int categorie);
+    void changeObjects(const int i, const int j);
+    void sortProducts(const int type);
+    string convertToLowerCase(string cad);
+    void invalidSearch();
+    void createGraph();
+    void generateRandomRecommendation();
+    void generateRecommendation(const QString product);
+    void clearGridRecommendation();
+    void setProductWidgetRecommendation();
 
     void showAllDepartments();
     void showSearchAllDepartments(const QString input);
@@ -101,15 +128,7 @@ private:
     void showSportOutdoors();
     void showSearchSportOutdoors(const QString input);
 
-    void evaluateHideSort(const int pos);
-    void putErrorMessage();
-    void showByPrice(const int type, const int categorie);
-    void changeObjects(const int i, const int j);
-    void sortProducts(const int type);
-    string convertToLowerCase(string cad);
-    void invalidSearch();
-    void createGraph();
-
+    void showRecomendation();
 };
 
 #endif // MAINWINDOW_H
